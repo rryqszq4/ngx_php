@@ -1,5 +1,7 @@
 ngx_php
 ======
+
+[![Join the chat at https://gitter.im/rryqszq4/ngx_php](https://badges.gitter.im/rryqszq4/ngx_php.svg)](https://gitter.im/rryqszq4/ngx_php?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/rryqszq4/ngx_php.svg?branch=master)](https://travis-ci.org/rryqszq4/ngx_php)
 
 Embedded php scripting language for nginx-module.  
