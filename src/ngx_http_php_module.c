@@ -12,6 +12,8 @@
 #include <nginx.h>
 
 #include "php/php_ngx.h"
+#include "php/php_ngx_core.h"
+#include "php/php_ngx_generator.h"
 
 #include "ngx_http_php_module.h"
 #include "ngx_http_php_directive.h"
@@ -544,10 +546,10 @@ ngx_http_php_init_worker(ngx_cycle_t *cycle)
 	php_ngx_module.ub_write = ngx_http_php_code_ub_write;
 	php_ngx_module.flush = ngx_http_php_code_flush;
 	//php_ngx_module.log_message = ngx_http_php_code_log_message;
-	php_ngx_module.register_server_variables = ngx_http_php_code_register_server_variables;
-	php_ngx_module.read_post = ngx_http_php_code_read_post;
-	php_ngx_module.read_cookies = ngx_http_php_code_read_cookies;
-	php_ngx_module.header_handler = ngx_http_php_code_header_handler;
+	//php_ngx_module.register_server_variables = ngx_http_php_code_register_server_variables;
+	//php_ngx_module.read_post = ngx_http_php_code_read_post;
+	//php_ngx_module.read_cookies = ngx_http_php_code_read_cookies;
+	//php_ngx_module.header_handler = ngx_http_php_code_header_handler;
 
 	if (pmcf->ini_path.len != 0){
 		php_ngx_module.php_ini_path_override = (char *)pmcf->ini_path.data;
@@ -559,6 +561,11 @@ ngx_http_php_init_worker(ngx_cycle_t *cycle)
 
 	old_zend_error_cb = zend_error_cb;
 	zend_error_cb = ngx_php_error_cb;
+
+	TSRMLS_FETCH();
+	php_ngx_request_init(TSRMLS_C);
+	php_co_ngx_init(0 TSRMLS_CC);
+	php_ngx_generator_init(0 TSRMLS_CC);
 
 	return NGX_OK;
 }
@@ -574,6 +581,7 @@ ngx_http_php_exit_worker(ngx_cycle_t *cycle)
 
 	pmcf = ngx_http_cycle_get_module_main_conf(cycle, ngx_http_php_module);
 
+	php_ngx_request_shutdown(TSRMLS_C);
 	php_ngx_module_shutdown(TSRMLS_C);
 
 	tpp = pmcf->thread_pools.elts;

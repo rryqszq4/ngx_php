@@ -126,7 +126,7 @@ PHP_METHOD(ngx_generator, next)
     call_user_function(NULL, &(closure), func_valid, &retval, 0, NULL TSRMLS_CC);
     zval_ptr_dtor(&func_valid);
 
-    ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,"bool: %d",Z_BVAL(retval));
+    //ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,"bool: %d",Z_BVAL(retval));
 
     if (Z_BVAL(retval) == 0) {
         ctx->rewrite_phase = 0;

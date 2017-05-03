@@ -296,7 +296,7 @@ ngx_http_php_sleep_generator_handler(ngx_event_t *ev)
 
     r = ev->data;
 
-    ngx_http_php_ctx_t *ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
+    //ngx_http_php_ctx_t *ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
 
     TSRMLS_FETCH();
     //TSRMLS_FETCH_FROM_CTX(ctx->uthread_ctx);
@@ -320,8 +320,8 @@ ngx_http_php_sleep_generator_handler(ngx_event_t *ev)
 
     }zend_end_try();
 
-    if (ctx->phase_status == NGX_AGAIN) {
+    //if (ctx->phase_status == NGX_AGAIN) {
         ngx_http_core_run_phases(r);
-    }
+    //}
 }
 

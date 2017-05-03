@@ -16,6 +16,7 @@ NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/src/ngx_http_php_module.c \
 				$ngx_addon_dir/src/php/php_ngx_log.c \
 				$ngx_addon_dir/src/php/php_ngx_time.c \
 				$ngx_addon_dir/src/php/php_ngx_core.c \
+				$ngx_addon_dir/src/php/php_ngx_generator.c \
 				$ngx_addon_dir/src/ngx_php_thread.c \
 				$ngx_addon_dir/src/ngx_php_thread_pool.c \
 				$ngx_addon_dir/src/ngx_php_uthread.c \
@@ -36,6 +37,7 @@ NGX_ADDON_DEPS="$NGX_ADDON_DEPS $ngx_addon_dir/src/ngx_http_php_module.h \
 				$ngx_addon_dir/src/php/php_ngx_log.h \
 				$ngx_addon_dir/src/php/php_ngx_time.h \
 				$ngx_addon_dir/src/php/php_ngx_core.h \
+				$ngx_addon_dir/src/php/php_ngx_generator.h \
 				$ngx_addon_dir/src/ngx_php_thread.h \
 				$ngx_addon_dir/src/ngx_php_thread_pool.h \
 				$ngx_addon_dir/src/ngx_php_uthread.h \
@@ -46,8 +48,8 @@ CORE_INCS="$CORE_INCS $PHP_INC $PHP_INC/main $PHP_INC/TSRM $PHP_INC/Zend $PHP_IN
 CORE_LIBS="$CORE_LIBS `$PHP_BIN/php-config --ldflags` -L$PHP_LIB -lphp5 `$PHP_BIN/php-config --libs` "
 
 
-#CORE_INCS="$CORE_INCS /usr/local/php5329/include/php /usr/local/php5329/include/php/main /usr/local/php5329/include/php/TSRM /usr/local/php5329/include/php/Zend /usr/local/php5329/include/php/ext /usr/local/php5329/include/php/ext/date/lib /usr/local/php5329/include/php/sapi/embed "
+#CORE_INCS="$CORE_INCS /usr/local/php56/include/php /usr/local/php56/include/php/main /usr/local/php56/include/php/TSRM /usr/local/php56/include/php/Zend /usr/local/php56/include/php/ext /usr/local/php56/include/php/ext/date/lib /usr/local/php56/include/php/sapi/embed "
 
-#CORE_LIBS="$CORE_LIBS `/usr/local/php5329/bin/php-config --ldflags` -L/usr/local/php5329/lib -lphp5 `/usr/local/php5329/bin/php-config --libs` "
+#CORE_LIBS="$CORE_LIBS `/usr/local/php56/bin/php-config --ldflags` -L/usr/local/php56/lib -lphp5 `/usr/local/php56/bin/php-config --libs` "
 
 have=NDK_SET_VAR . auto/have
