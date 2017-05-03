@@ -23,6 +23,7 @@ GET /rewrite-content
 --- response_body
 running rewrite
 running content
+var rewrite
 
 
 
