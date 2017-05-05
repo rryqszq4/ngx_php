@@ -23,6 +23,7 @@ GET /rewrite-content
 --- response_body
 running rewrite
 running content
+var rewrite
 
 
 
@@ -39,45 +40,6 @@ running content
     }
 --- request
 GET /rewrite-content
---- response_body
-running rewrite
-
-
-
-=== TEST 3: linked rewrite and content_thread
---- config
-    location /rewrite-content-thread {
-        rewrite_by_php '
-            $var = "var rewrite\n";
-            echo "running rewrite\n";
-        ';
-        thread_by_php '
-            echo "running content thread\n";
-            echo "end content thread\n";
-        ';
-    }
---- request
-GET /rewrite-content-thread
---- response_body
-running rewrite
-running content thread
-end content thread
-
-
-
-=== TEST 4: linked rewrite-content_thread, rewrite block
---- config
-    location /rewrite-content-thread {
-        rewrite_by_php '
-            echo "running rewrite\n";
-            ngx::_exit(NGX_OK);
-        ';
-        thread_by_php '
-            echo "running content thread\n";
-        ';
-    }
---- request
-GET /rewrite-content-thread
 --- response_body
 running rewrite
 

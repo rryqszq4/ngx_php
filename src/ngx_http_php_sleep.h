@@ -17,8 +17,8 @@ ngx_int_t ngx_http_php_sleep_thread_run(ngx_http_request_t *r);
 
 void ngx_http_php_sleep_thread_handler(ngx_event_t *ev);
 
-ngx_int_t ngx_http_php_sleep_uthread_run(ngx_http_request_t *r);
+ngx_int_t ngx_http_php_sleep_generator_run(ngx_http_request_t *r);
 
-void ngx_http_php_sleep_uthread_handler(ngx_event_t *ev);
+void ngx_http_php_sleep_generator_handler(ngx_event_t *ev);
 
 #endif

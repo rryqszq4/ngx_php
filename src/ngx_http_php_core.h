@@ -117,6 +117,12 @@ typedef struct ngx_http_php_ctx_s {
 	unsigned rewrite_phase : 1;
 	unsigned access_phase : 1;
 	unsigned content_phase : 1;
+
+	ngx_int_t phase_status;
+
+	void **uthread_ctx;
+
+	zval *generator_closure;
 	
 } ngx_http_php_ctx_t;
 

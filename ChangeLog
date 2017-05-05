@@ -1,3 +1,8 @@
+2017-03-29 rryqszq4 <rryqszq@gmail.com>
+	* add ngx_generator for coroutine
+
+	* remove directive thread_by_php
+
 2017-03-29 rryqszq4 <ngxphp@gmail.com>
 	* add ngx_php_uthread is coroutine use of ucontext
 

@@ -251,7 +251,7 @@ ngx_http_php_sleep_thread_handler(ngx_event_t *ev)
 }
 
 ngx_int_t 
-ngx_http_php_sleep_uthread_run(ngx_http_request_t *r)
+ngx_http_php_sleep_generator_run(ngx_http_request_t *r)
 {
     ngx_http_cleanup_t *cln;
 
@@ -261,14 +261,20 @@ ngx_http_php_sleep_uthread_run(ngx_http_request_t *r)
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
 
+    ctx->rewrite_phase = 1;
+    ctx->phase_status = NGX_AGAIN;
+
+    //TSRMLS_FETCH();
+    //TSRMLS_SET_CTX(ctx->uthread_ctx);
+
     ngx_memzero(&ctx->sleep, sizeof(ngx_event_t));
 
     //ev.timer_set = 0;
-    ctx->sleep.handler = ngx_http_php_sleep_uthread_handler;
+    ctx->sleep.handler = ngx_http_php_sleep_generator_handler;
     ctx->sleep.log = r->connection->log;
     ctx->sleep.data = r;
 
-    ngx_add_timer(&ctx->sleep, (ngx_msec_t) 2000);
+    ngx_add_timer(&ctx->sleep, (ngx_msec_t) ctx->delay_time);
 
     cln = ngx_http_cleanup_add(r, 0);
     if (cln == NULL) {
@@ -284,20 +290,38 @@ ngx_http_php_sleep_uthread_run(ngx_http_request_t *r)
 }
 
 void 
-ngx_http_php_sleep_uthread_handler(ngx_event_t *ev)
+ngx_http_php_sleep_generator_handler(ngx_event_t *ev)
 {
     ngx_http_request_t *r;
 
     r = ev->data;
 
-    ngx_http_php_ctx_t *ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
+    //ngx_http_php_ctx_t *ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
 
-    ngx_php_uthread_resume(ctx->uthread);
+    TSRMLS_FETCH();
+    //TSRMLS_FETCH_FROM_CTX(ctx->uthread_ctx);
 
-    ctx->rewrite_phase = 1;
+    //ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "rewrite_phase: %d r:%p closure:%p", ctx->rewrite_phase,r,ctx->generator_closure);
 
-    if (ctx->rewrite_phase || ctx->access_phase || ctx->content_phase) {
+    zend_first_try {
+        PHP_NGX_G(global_r) = r;
+        //zend_eval_string_ex("foreach (coroutine_run() as $number) {echo $number.\"\n\";echo \"break\n\";break;}", NULL, "ngx_php eval code", 1 TSRMLS_CC);
+        //zend_eval_string_ex("var_dump($run->valid());$run->next();var_dump($run->valid());", NULL, "ngx_php eval code", 1 TSRMLS_CC);
+        zend_eval_string_ex("ngx_generator::next();", NULL, "ngx_php eval code", 1 TSRMLS_CC);
+
+        /*zval *func_next;
+        zval retval;
+        MAKE_STD_ZVAL(func_next);
+        ZVAL_STRING(func_next, "next", 1);
+
+        call_user_function(NULL, &(ctx->generator_closure), func_next, &retval, 0, NULL TSRMLS_CC);
+
+        zval_ptr_dtor(&func_next);*/
+
+    }zend_end_try();
+
+    //if (ctx->phase_status == NGX_AGAIN) {
         ngx_http_core_run_phases(r);
-    }
+    //}
 }
 
