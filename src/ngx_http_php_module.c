@@ -134,6 +134,7 @@ static ngx_command_t ngx_http_php_commands[] = {
 	},
 	*/
 
+	/*
 	{ngx_string("thread_by_php_file"),
 	 NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
 	 	|NGX_CONF_TAKE1,
@@ -151,6 +152,7 @@ static ngx_command_t ngx_http_php_commands[] = {
 	 0,
 	 ngx_http_php_content_inline_thread_handler
 	},
+	*/
 
 	{ngx_string("log_by_php_file"),
 	 NGX_HTTP_MAIN_CONF|NGX_HTTP_SRV_CONF|NGX_HTTP_LOC_CONF|NGX_HTTP_LIF_CONF
