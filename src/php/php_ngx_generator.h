@@ -17,6 +17,10 @@
 extern ZEND_API zend_class_entry *zend_ce_generator;
 
 PHP_METHOD(ngx_generator, run);
+PHP_METHOD(ngx_generator, next);
+
+PHP_METHOD(ngx_php, main);
+PHP_METHOD(ngx_php, next);
 
 void php_ngx_generator_init(int module_number TSRMLS_DC);
 
