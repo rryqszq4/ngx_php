@@ -14,6 +14,7 @@
 #include "php/php_ngx.h"
 #include "php/php_ngx_core.h"
 #include "php/php_ngx_generator.h"
+#include "php/php_ngx_log.h"
 
 #include "ngx_http_php_module.h"
 #include "ngx_http_php_directive.h"
@@ -568,6 +569,7 @@ ngx_http_php_init_worker(ngx_cycle_t *cycle)
 	php_ngx_request_init(TSRMLS_C);
 	php_co_ngx_init(0 TSRMLS_CC);
 	php_ngx_generator_init(0 TSRMLS_CC);
+	php_ngx_log_init(0 TSRMLS_CC);
 
 	return NGX_OK;
 }
