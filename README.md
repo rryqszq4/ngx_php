@@ -128,11 +128,9 @@ Directives
 
 php_ini_path
 ------------
-**syntax:** *php_ini_path &lt;php.ini file path&gt;*  
-
-**context:** *http*  
-
-**phase:** *loading-config*  
+* **syntax:** `php_ini_path &lt;php.ini file path&gt;`
+* **context:** `http`
+* **phase:** `loading-config`
 
 Loading php configuration file in nginx configuration initialization.
 
@@ -142,31 +140,25 @@ php_ini_path /usr/local/php/etc/php.ini;
 
 init_by_php
 -----------
-**syntax:** *init_by_php &lt;php script code&gt;*  
-
-**context:** *http*  
-
-**phase:** *loading-config*
+* **syntax:** `init_by_php &lt;php script code&gt;`
+* **context:** `http`
+* **phase:** `loading-config`
 
 In nginx configuration initialization or boot time, run some php scripts.
 
 init_by_php_file
 ----------------
-**syntax:** *init_by_php_file &lt;php script file&gt;*  
-
-**context:** *http*  
-
-**phase:** *loading-config*
+* **syntax:** `init_by_php_file &lt;php script file&gt;`
+* **context:** `http`
+* **phase:** `loading-config`
 
 In nginx configuration initialization or boot time, run some php script file.
 
 rewrite_by_php
 --------------
-**syntax:** *rewrite_by_php &lt;php script code&gt;*  
-
-**context:** *http, server, location, location if*  
-
-**phase:** *rewrite*
+* **syntax:** `rewrite_by_php &lt;php script code&gt;`
+* **context:** `http, server, location, location if`
+* **phase:** `rewrite`
 
 Use php script redirect in nginx rewrite stage of.
 
@@ -181,41 +173,33 @@ location /rewrite_by_php {
 
 rewrite_by_php_file
 -------------------
-**syntax:** *rewrite_by_php_file &lt;php script file&gt;*  
-
-**context:** *http, server, location, location if*  
-
-**phase:** *rewrite*
+* **syntax:** `rewrite_by_php_file &lt;php script file&gt;`
+* **context:** `http, server, location, location if`
+* **phase:** `rewrite`
 
 Use php script file, redirect in nginx rewrite stage of.
 
 access_by_php
 -------------
-**syntax:** *access_by_php &lt;php script code&gt;*  
-
-**context:** *http, server, location, location if*  
-
-**phase:** *access*
+* **syntax:** `access_by_php &lt;php script code&gt;`
+* **context:** `http, server, location, location if`
+* **phase:** `access`
 
 Nginx in the access phase, the php script determine access.
 
 access_by_php_file
 ------------------
-**syntax:** *access_by_php_file &lt;php script file&gt;*  
-
-**context:** *http, server, location, location if*  
-
-**phase:** *access*
+* **syntax:** `access_by_php_file &lt;php script file&gt;`
+* **context:** `http, server, location, location if`
+* **phase:** `access`
 
 Nginx in the access phase, the php script file Analyzing access.
 
 content_by_php
 --------------
-**syntax:** *content_by_php &lt;php script code&gt;*  
-
-**context:** *http, server, location, location if*  
-
-**phase:** *content*
+* **syntax:** `content_by_php &lt;php script code&gt;`
+* **context:** `http, server, location, location if`
+* **phase:** `content`
 
 Most central command, run php script nginx stage of content.
 ```nginx
@@ -231,11 +215,9 @@ location /content_by_php {
 
 content_by_php_file
 -------------------
-**syntax:** *content_by_php_file &lt;php script file&gt;*  
-
-**context:** *http, server, location, location if*  
-
-**phase:** *content*
+* **syntax:** `content_by_php_file &lt;php script file&gt;` 
+* **context:** `http, server, location, location if`
+* **phase:** `content`
 
 Most central command, run php script file nginx stage of content.
 ```nginx
@@ -246,64 +228,53 @@ location /content_by_php_file {
 
 log_by_php
 ----------
-**syntax:** *log_by_php &lt;php script code&gt;*  
-
-**context:** *http, server, location, location if*  
-
-**phase:** *log*
+* **syntax:** `log_by_php &lt;php script code&gt;`
+* **context:** `http, server, location, location if`
+* **phase:** `log`
 
 log_by_php_file
 ---------------
-**syntax:** *log_by_php_file &lt;php script file&gt;*  
-
-**context:** *http, server, location, location if*  
-
-**phase:** *log*
+* **syntax:** `log_by_php_file &lt;php script file&gt;`
+* **context:** `http, server, location, location if`
+* **phase:** `log`
 
 set_by_php
 ----------
-**syntax:** *set_by_php &lt;php script code&gt;*  
-
-**context:** *server, server if, location, location if*  
-
-**phase:** *content*
+* **syntax:** `set_by_php &lt;php script code&gt;`
+* **context:** `server, server if, location, location if`
+* **phase:** `content`
 
 set_run_by_php
 --------------
-**syntax:** *set_run_by_php &lt;php script code&gt;*  
-
-**context:** *server, server if, location, location if*  
-
-**phase:** *content*
+* **syntax:** `set_run_by_php &lt;php script code&gt;`
+* **context:** `server, server if, location, location if`
+* **phase:** `content`
 
 set_by_php_file
 ---------------
-**syntax:** *set_by_php_file &lt;php script file&gt;*  
-
-**context:** *server, server if, location, location if*  
-
-**phase:** *content*
+* **syntax:** `set_by_php_file &lt;php script file&gt;`
+* **context:** `server, server if, location, location if`
+* **phase:** `content`
 
 set_run_by_php_file
 -------------------
-**syntax:** *set_run_by_php_file &lt;php script file&gt;*  
-
-**context:** *server, server if, location, location if*  
-
-**phase:** *content*
+* **syntax:** `set_run_by_php_file &lt;php script file&gt;`
+* **context:** `server, server if, location, location if`
+* **phase:** `content`
 
 
 Nginx API for php
 -----------------
 * [ngx::_exit](#ngx_exit)
-* [ngx::sleep](#ngx_sleep)
+* [ngx::sleep](#ngxsleep)
 * [ngx_generator::run]
+* [ngx_php::main]
+* [ngx_log::error](#ngx_logerror)
 
 ngx::_exit
 ----------
-**syntax:** *ngx::_exit(int $status)*  
-
-**context:** *content_by_php*  
+* **syntax:** `ngx::_exit(int $status)`
+* **context:** `content_by_php`
 
 ```php
 echo "start\n";
@@ -313,15 +284,13 @@ echo "end\n";
 
 ngx::sleep
 ----------
-**syntax:** *ngx::sleep(int $time)*  
-
-**context:** *content_by_php*  
+* **syntax:** `ngx::sleep(int $time)`
+* **context:** `content_by_php`
 
 ngx_log::error
 --------------
-**syntax:** *ngx_log::error(int level, string log)* 
-
-**context:** *thread_by_php* 
+* **syntax:** `ngx_log::error(int level, string log)`
+* **context:** `content_by_php`
 
 Nginx log of level in php.
 * NGX_LOG_STDERR

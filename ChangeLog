@@ -3,6 +3,8 @@
 
 	* remove directive thread_by_php
 
+	* add api ngx_php::main, ngx_php::next for coroutine 
+
 2017-03-29 rryqszq4 <ngxphp@gmail.com>
 	* add ngx_php_uthread is coroutine use of ucontext
 
