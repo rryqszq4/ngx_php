@@ -387,7 +387,7 @@ ngx_http_php_create_main_conf(ngx_conf_t *cf)
 static char *
 ngx_http_php_init_main_conf(ngx_conf_t *cf, void *conf)
 {
-	ngx_http_php_main_conf_t *pmcf = conf;
+	/*ngx_http_php_main_conf_t *pmcf = conf;
 
 	//ngx_uint_t i;
 	ngx_php_thread_pool_t  *tp, **tpp;
@@ -408,7 +408,7 @@ ngx_http_php_init_main_conf(ngx_conf_t *cf, void *conf)
 		return NULL;
 	}
 
-	*tpp = tp;
+	*tpp = tp;*/
 
 	//ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, "%d", pmcf->thread_pools.nelts);
 
@@ -524,8 +524,8 @@ static ngx_int_t
 ngx_http_php_init_worker(ngx_cycle_t *cycle)
 {
 	//TSRMLS_FETCH();
-	ngx_uint_t					i;
-	ngx_php_thread_pool_t 		**tpp;
+	/*ngx_uint_t					i;
+	ngx_php_thread_pool_t 		**tpp;*/
 	ngx_http_php_main_conf_t 	*pmcf;
 
 	pmcf = ngx_http_cycle_get_module_main_conf(cycle, ngx_http_php_module);
@@ -537,13 +537,13 @@ ngx_http_php_init_worker(ngx_cycle_t *cycle)
 	//ngx_log_error(NGX_LOG_ERR, cycle->log, 0, "thread pool done %p", &ngx_php_thread_pool_done);
 	//ngx_log_error(NGX_LOG_ERR, cycle->log, 0, "thread pool running %p", &ngx_php_thread_pool_running);
 
-	tpp = pmcf->thread_pools.elts;
+	/*tpp = pmcf->thread_pools.elts;
 
 	for (i = 0; i < pmcf->thread_pools.nelts; i++) {
 		if (ngx_php_thread_pool_init(tpp[i], cycle->log, cycle->pool) != NGX_OK) {
 			return NGX_ERROR;
 		}
-	}
+	}*/
 
 	//-> init run php
 	php_ngx_module.ub_write = ngx_http_php_code_ub_write;
