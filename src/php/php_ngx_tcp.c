@@ -223,7 +223,7 @@ static const zend_function_entry php_ngx_tcp_class_functions[] = {
 };
 
 void 
-ngx_tcp_init(int module_number TSRMLS_DC)
+php_ngx_tcp_init(int module_number TSRMLS_DC)
 {
     zend_class_entry ngx_tcp_class_entry;
     INIT_CLASS_ENTRY(ngx_tcp_class_entry, "ngx_tcp", php_ngx_tcp_class_functions);
