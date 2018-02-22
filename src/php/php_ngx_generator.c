@@ -180,7 +180,7 @@ PHP_METHOD(ngx_php, main)
     if (Z_TYPE_P(ctx->generator_closure) == IS_OBJECT) {
         MAKE_STD_ZVAL(func_valid);
         ZVAL_STRING(func_valid, "valid", 1);
-        if (call_user_function(NULL, &(ctx->generator_closure), func_valid, &retval, 0, NULL) == FAILURE)
+        if (call_user_function(NULL, &(ctx->generator_closure), func_valid, &retval, 0, NULL TSRMLS_CC) == FAILURE)
         {
             php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed calling valid");
             return ;
@@ -192,7 +192,7 @@ PHP_METHOD(ngx_php, main)
         if (Z_TYPE(retval) == 3) {
             MAKE_STD_ZVAL(func_next);
             ZVAL_STRING(func_next, "next", 1);
-            if (call_user_function(NULL, &(ctx->generator_closure), func_valid, &retval, 0, NULL) == FAILURE)
+            if (call_user_function(NULL, &(ctx->generator_closure), func_valid, &retval, 0, NULL TSRMLS_CC) == FAILURE)
             {
                 php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed calling valid");
                 return ;
