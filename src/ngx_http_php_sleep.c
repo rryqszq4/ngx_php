@@ -71,6 +71,8 @@ ngx_http_php_sleep(ngx_http_request_t *r)
 static void 
 ngx_http_php_sleep_handler(ngx_event_t *ev)
 {
+    TSRMLS_FETCH();
+    
     ngx_http_request_t *r;
 
     r = ev->data;
