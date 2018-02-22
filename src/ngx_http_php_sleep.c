@@ -1,12 +1,16 @@
 /**
- *    Copyright(c) 2016-2017 rryqszq4
+ *    Copyright(c) 2016-2018 rryqszq4
  *
  *
  */
 
+
+#include "ngx_php_debug.h"
 #include "ngx_http_php_sleep.h"
-#include "ngx_http_php_subrequest.h"
-#include "ngx_http_php_socket_tcp.h"
+
+static void ngx_http_php_sleep_cleanup(void *data);
+
+static void ngx_http_php_sleep_handler(ngx_event_t *ev);
 
 static void
 ngx_http_php_sleep_cleanup(void *data) 
@@ -27,6 +31,61 @@ ngx_http_php_sleep_cleanup(void *data)
     
 }
 
+ngx_int_t
+ngx_http_php_sleep(ngx_http_request_t *r) 
+{
+    ngx_http_cleanup_t *cln;
+    ngx_http_php_ctx_t *ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
+
+    if (ctx == NULL) {
+        return NGX_HTTP_INTERNAL_SERVER_ERROR;
+    }
+    
+    ctx->phase_status = NGX_AGAIN;
+
+    //ngx_memzero(&ctx->sleep, sizeof(ngx_event_t));
+
+    ctx->sleep.handler = ngx_http_php_sleep_handler;
+    ctx->sleep.log = r->connection->log;
+    ctx->sleep.data = r;
+
+    //ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,"%p %p %d", r, &ctx->sleep, ctx->delay_time);
+
+    ngx_php_debug("r:%p, &ctx->sleep:%p, ctx->delay_time:%d", r, &ctx->sleep, (int)ctx->delay_time);
+
+    ngx_add_timer(&ctx->sleep, (ngx_msec_t) ctx->delay_time);
+
+    cln = ngx_http_cleanup_add(r, 0);
+    if (cln == NULL) {
+        return NGX_ERROR;
+    }
+
+    cln->handler = ngx_http_php_sleep_cleanup;
+    cln->data = r;
+
+    r->keepalive = 0;
+
+    return NGX_OK;
+}
+
+static void 
+ngx_http_php_sleep_handler(ngx_event_t *ev)
+{
+    ngx_http_request_t *r;
+
+    r = ev->data;
+
+    zend_first_try {
+        PHP_NGX_G(global_r) = r;
+        
+        zend_eval_string_ex("ngx_php::next();", NULL, "ngx_php eval code", 1 TSRMLS_CC);
+
+    }zend_end_try();
+
+    ngx_http_core_run_phases(r);
+}
+
+/*
 ngx_int_t ngx_http_php_sleep_run(ngx_http_request_t *r)
 {
     //ngx_event_t ev;
@@ -54,10 +113,10 @@ ngx_int_t ngx_http_php_sleep_run(ngx_http_request_t *r)
     ctx->sleep.log = r->connection->log;
     ctx->sleep.data = r;
 
-    /*wev = c->write;
-    wev->log = c->log;
-    wev->handler = ngx_http_php_sleep_handler;
-    wev->data = c;*/
+    //wev = c->write;
+    //wev->log = c->log;
+    //wev->handler = ngx_http_php_sleep_handler;
+    //wev->data = c;
 
     //ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "ngx_add_timer");
 
@@ -203,10 +262,10 @@ ngx_http_php_sleep_thread_run(ngx_http_request_t *r)
     ctx->sleep.log = r->connection->log;
     ctx->sleep.data = r;
 
-    /*wev = c->write;
-    wev->log = c->log;
-    wev->handler = ngx_http_php_sleep_handler;
-    wev->data = c;*/
+    //wev = c->write;
+    //wev->log = c->log;
+    //wev->handler = ngx_http_php_sleep_handler;
+    //wev->data = c;
 
     //ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "ngx_add_timer %p",ctx->sleep);
 
@@ -309,14 +368,14 @@ ngx_http_php_sleep_generator_handler(ngx_event_t *ev)
         //zend_eval_string_ex("var_dump($run->valid());$run->next();var_dump($run->valid());", NULL, "ngx_php eval code", 1 TSRMLS_CC);
         zend_eval_string_ex("ngx_generator::next();", NULL, "ngx_php eval code", 1 TSRMLS_CC);
 
-        /*zval *func_next;
-        zval retval;
-        MAKE_STD_ZVAL(func_next);
-        ZVAL_STRING(func_next, "next", 1);
+        //zval *func_next;
+        //zval retval;
+        //MAKE_STD_ZVAL(func_next);
+        //ZVAL_STRING(func_next, "next", 1);
 
-        call_user_function(NULL, &(ctx->generator_closure), func_next, &retval, 0, NULL TSRMLS_CC);
+        //call_user_function(NULL, &(ctx->generator_closure), func_next, &retval, 0, NULL TSRMLS_CC);
 
-        zval_ptr_dtor(&func_next);*/
+        //zval_ptr_dtor(&func_next);
 
     }zend_end_try();
 
@@ -324,4 +383,5 @@ ngx_http_php_sleep_generator_handler(ngx_event_t *ev)
         ngx_http_core_run_phases(r);
     //}
 }
+*/
 

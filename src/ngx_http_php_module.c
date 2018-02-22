@@ -1,5 +1,5 @@
 /**
- *    Copyright(c) 2016-2017 rryqszq4
+ *    Copyright(c) 2016-2018 rryqszq4
  *
  *
  */
@@ -567,7 +567,8 @@ ngx_http_php_init_worker(ngx_cycle_t *cycle)
 
 	TSRMLS_FETCH();
 	php_ngx_request_init(TSRMLS_C);
-	php_co_ngx_init(0 TSRMLS_CC);
+	
+	php_ngx_core_init(0 TSRMLS_CC);
 	php_ngx_generator_init(0 TSRMLS_CC);
 	php_ngx_log_init(0 TSRMLS_CC);
 
