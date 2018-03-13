@@ -1,5 +1,5 @@
 /**
- *    Copyright(c) 2016-2017 rryqszq4
+ *    Copyright(c) 2016-2018 rryqszq4
  *
  *
  */
@@ -13,7 +13,10 @@
 #include <php_ini.h>
 #include <ext/standard/info.h>
 
-PHP_METHOD(ngx, exit);
+PHP_METHOD(ngx, _exit);
+PHP_METHOD(ngx, query_args);
+PHP_METHOD(ngx, post_args);
+PHP_METHOD(ngx, sleep);
 
 void php_ngx_core_init(int module_number TSRMLS_DC);
 

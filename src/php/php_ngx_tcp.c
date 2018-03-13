@@ -66,7 +66,7 @@ PHP_METHOD(ngx_tcp, connect)
 
     ctx->host.len = host_len;
 
-    ngx_memcpy(ctx->host.data, (u_char *)host_str, host_len + 1);
+    ngx_memcpy(ctx->host.data, (u_char *)host_str, host_len);
     ctx->host.data[host_len] = '\0';
 
     ctx->port = port;

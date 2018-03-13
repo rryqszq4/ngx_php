@@ -12,7 +12,7 @@ static void ngx_http_php_socket_tcp_cleanup(void *data);
 ngx_int_t 
 ngx_http_php_socket_tcp_run(ngx_http_request_t *r)
 {
-    ngx_php_request = r;
+    //ngx_php_request = r;
     //ngx_str_t *host;
     int port;
     ngx_url_t url;
@@ -24,6 +24,8 @@ ngx_http_php_socket_tcp_run(ngx_http_request_t *r)
     if (ctx == NULL){
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
+
+    ctx->phase_status = NGX_AGAIN;
 
     if (ngx_http_php_upstream_create(r) != NGX_OK)
     {
@@ -117,11 +119,11 @@ ngx_http_php_socket_tcp_run(ngx_http_request_t *r)
     u->input_filter = ngx_http_php_socket_tcp_filter;
     u->input_filter_ctx = ctx;
 
-    r->subrequest_in_memory = 1;
+    //r->subrequest_in_memory = 1;
 
     r->main->count++;
 
-    //ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "ngx_http_php_upstream_init");
+    ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "ngx_http_php_upstream_init %p %d %s",r, u->resolved->port, u->resolved->host.data);
 
     ngx_http_php_upstream_init(r);
 
@@ -153,6 +155,8 @@ ngx_http_php_socket_tcp_run(ngx_http_request_t *r)
         }
     }*/
 
+    //r->keepalive = 0;
+
     return NGX_OK;
 }
 
@@ -162,7 +166,7 @@ ngx_http_php_socket_tcp_create_request(ngx_http_request_t *r)
     ngx_buf_t  *b;
     ngx_chain_t *cl;
 
-    ngx_php_request = r;
+    //ngx_php_request = r;
     ngx_http_php_ctx_t *ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
 
     if (ctx->send_buf.data) {
@@ -177,7 +181,7 @@ ngx_http_php_socket_tcp_create_request(ngx_http_request_t *r)
         cl->next = NULL;
 
         r->upstream->request_bufs = cl;
-
+        
         b->last = ngx_copy(b->last, ctx->send_buf.data, ctx->send_buf.len);
 
         /*
@@ -199,8 +203,12 @@ ngx_http_php_socket_tcp_create_request(ngx_http_request_t *r)
 
         r->header_hash = 1;
         */
-        //ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
-        //                  "start %s %d", r->upstream->request_bufs->buf->last, ctx->send_buf.len);
+        ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
+                          "start %p %s %d", r, r->upstream->request_bufs->buf->last, sizeof(r->upstream->request_bufs->buf));
+
+        ngx_log_error(NGX_LOG_ERR, r->connection->log, 0,
+                        "%N\"%*s\"",
+                   (size_t) (b->last - b->pos), b->pos);
 
         //ngx_http_set_ctx(r, ctx, ngx_http_php_module);
     }
@@ -229,7 +237,7 @@ ngx_http_php_socket_tcp_process_header(ngx_http_request_t *r)
     }
 
     u = r->upstream;
-
+    ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "123");
     //ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "%*s", (&u->buffer)->last - (&u->buffer)->pos,(&u->buffer)->pos);
 
     //ctx->receive_buf.len = (&u->buffer)->last - (&u->buffer)->pos;

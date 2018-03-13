@@ -9,12 +9,9 @@ NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/src/ngx_http_php_module.c \
 				$ngx_addon_dir/src/ngx_http_php_upstream.c \
 				$ngx_addon_dir/src/ngx_http_php_socket_tcp.c \
 				$ngx_addon_dir/src/ngx_http_php_sleep.c \
-				$ngx_addon_dir/src/ngx_http_php_thread_handler.c \
+				$ngx_addon_dir/src/ngx_php_debug.c \
 				$ngx_addon_dir/src/php/php_ngx.c \
-				$ngx_addon_dir/src/php/php_ngx_location.c \
-				$ngx_addon_dir/src/php/php_ngx_socket_tcp.c \
 				$ngx_addon_dir/src/php/php_ngx_log.c \
-				$ngx_addon_dir/src/php/php_ngx_time.c \
 				$ngx_addon_dir/src/php/php_ngx_core.c \
 				$ngx_addon_dir/src/php/php_ngx_generator.c \
 				$ngx_addon_dir/src/ngx_php_thread.c \
@@ -30,12 +27,9 @@ NGX_ADDON_DEPS="$NGX_ADDON_DEPS $ngx_addon_dir/src/ngx_http_php_module.h \
 				$ngx_addon_dir/src/ngx_http_php_upstream.h \
 				$ngx_addon_dir/src/ngx_http_php_socket_tcp.h \
 				$ngx_addon_dir/src/ngx_http_php_sleep.h \
-				$ngx_addon_dir/src/ngx_http_php_thread_handler.h \
+				$ngx_addon_dir/src/ngx_php_debug.h \
 				$ngx_addon_dir/src/php/php_ngx.h \
-				$ngx_addon_dir/src/php/php_ngx_location.h \
-				$ngx_addon_dir/src/php/php_ngx_socket_tcp.h \
 				$ngx_addon_dir/src/php/php_ngx_log.h \
-				$ngx_addon_dir/src/php/php_ngx_time.h \
 				$ngx_addon_dir/src/php/php_ngx_core.h \
 				$ngx_addon_dir/src/php/php_ngx_generator.h \
 				$ngx_addon_dir/src/ngx_php_thread.h \

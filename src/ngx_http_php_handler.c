@@ -1,5 +1,5 @@
 /**
- *    Copyright(c) 2016-2017 rryqszq4
+ *    Copyright(c) 2016-2018 rryqszq4
  *
  *
  */
@@ -13,8 +13,6 @@
 #include "ngx_http_php_sleep.h"
 
 #include "php/php_ngx_core.h"
-#include "php/php_ngx_location.h"
-#include "php/php_ngx_socket_tcp.h"
 #include "php/php_ngx_log.h"
 #include "php/php_ngx_time.h"
 #include "php/php_ngx_generator.h"
@@ -260,7 +258,7 @@ set_output:
 	ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
 
 	if (ctx->generator_closure ) {
-		zval_ptr_dtor(&ctx->generator_closure);
+		//zval_ptr_dtor(&ctx->generator_closure);
 	}
 
 	ctx->phase_status = NGX_DECLINED;
@@ -397,7 +395,7 @@ set_output:
 	ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
 
 	if (ctx->generator_closure ) {
-		zval_ptr_dtor(&ctx->generator_closure);
+		//zval_ptr_dtor(&ctx->generator_closure);
 	}
 
 	ctx->phase_status = NGX_DECLINED;
@@ -602,7 +600,7 @@ set_output:
 	ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
 
 	if (ctx->generator_closure ) {
-		zval_ptr_dtor(&ctx->generator_closure);
+		//zval_ptr_dtor(&ctx->generator_closure);
 	}
 
 	ctx->phase_status = NGX_DECLINED;
@@ -730,7 +728,7 @@ set_output:
 	ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
 
 	if (ctx->generator_closure ) {
-		zval_ptr_dtor(&ctx->generator_closure);
+		//zval_ptr_dtor(&ctx->generator_closure);
 	}
 
 	ctx->phase_status = NGX_DECLINED;
@@ -943,7 +941,7 @@ set_output:
 	ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
 
 	if (ctx->generator_closure ) {
-		zval_ptr_dtor(&ctx->generator_closure);
+		//zval_ptr_dtor(&ctx->generator_closure);
 	}
 
 	ctx->phase_status = NGX_DECLINED;
@@ -1102,7 +1100,7 @@ set_output:
 	ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
 
 	if (ctx->generator_closure ) {
-		zval_ptr_dtor(&ctx->generator_closure);
+		//zval_ptr_dtor(&ctx->generator_closure);
 	}
 
 	ctx->phase_status = NGX_DECLINED;
@@ -1575,6 +1573,7 @@ ngx_http_php_content_async_inline_handler(ngx_http_request_t *r)
 }
 */
 
+/*
 void *
 ngx_http_php_sync_inline_thread(void *arg)
 {
@@ -1609,6 +1608,7 @@ ngx_http_php_sync_inline_thread(void *arg)
 
 	return NULL;
 }
+*/
 
 /*
 ngx_int_t 
@@ -1757,6 +1757,7 @@ ngx_http_php_content_sync_inline_handler(ngx_http_request_t *r)
 }
 */
 
+/*
 ngx_int_t 
 ngx_http_php_content_thread_inline_handler(ngx_http_request_t *r)
 {
@@ -2094,7 +2095,7 @@ ngx_http_php_content_thread_file_handler(ngx_http_request_t *r)
 
 	return NGX_OK;
 }
-
+*/
 
 ngx_int_t 
 ngx_http_php_log_handler(ngx_http_request_t *r)

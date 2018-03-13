@@ -1,5 +1,5 @@
 /**
- *    Copyright(c) 2016-2017 rryqszq4
+ *    Copyright(c) 2016-2018 rryqszq4
  *
  *
  */
@@ -10,11 +10,15 @@
 
 static zend_class_entry *php_ngx_class_entry;
 static zend_class_entry *php_co_ngx_class_entry;
-//static zend_class_entry *php_thd_ngx_class_entry;
 
 ZEND_BEGIN_ARG_INFO_EX(ngx_exit_arginfo, 0, 0, 1)
     ZEND_ARG_INFO(0, status)
 ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(ngx_query_args_arginfo, 0, 0, 1)
+    ZEND_ARG_INFO(0, key)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(ngx_sleep_arginfo, 0, 0, 1)
     ZEND_ARG_INFO(0, time)
 ZEND_END_ARG_INFO()
@@ -32,7 +36,7 @@ PHP_METHOD(ngx, _exit)
     zend_bailout();
 }
 
-
+/*
 PHP_METHOD(co_ngx, _exit)
 {
     long status = 0;
@@ -45,7 +49,32 @@ PHP_METHOD(co_ngx, _exit)
 
     zend_bailout();
 }
+*/
 
+PHP_METHOD(ngx, sleep)
+{
+    ngx_http_request_t *r;
+    ngx_http_php_ctx_t *ctx;
+    long time;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &time) == FAILURE) {
+        RETURN_NULL();
+    }
+
+    r = PHP_NGX_G(global_r);
+    ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
+
+    if (ctx == NULL) {
+
+    }
+
+    ctx->delay_time = time * 1000;
+
+    ngx_http_php_sleep(r);
+
+}
+
+/*
 PHP_METHOD(co_ngx, sleep)
 {
     long time;
@@ -69,15 +98,17 @@ PHP_METHOD(co_ngx, sleep)
     ngx_http_php_sleep_generator_run(r);
 
 }
+*/
 
 static const zend_function_entry php_ngx_class_functions[] = {
     PHP_ME(ngx, _exit, ngx_exit_arginfo, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+    PHP_ME(ngx, sleep, ngx_sleep_arginfo, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
     {NULL, NULL, NULL, 0, 0}
 };
 
 static const zend_function_entry php_co_ngx_class_function[] = {
-    PHP_ME(co_ngx, _exit, ngx_exit_arginfo, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-    PHP_ME(co_ngx, sleep, ngx_sleep_arginfo, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+    //PHP_ME(co_ngx, _exit, ngx_exit_arginfo, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+    //PHP_ME(co_ngx, sleep, ngx_sleep_arginfo, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
     {NULL, NULL, NULL, 0, 0}
 };
 
