@@ -6,9 +6,10 @@
 [![Gitter](https://badges.gitter.im/rryqszq4/ngx_php.svg)](https://gitter.im/rryqszq4/ngx_php?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![GitHub release](https://img.shields.io/github/release/rryqszq4/ngx_php.svg)](https://github.com/rryqszq4/ngx_php/releases/latest)
 [![license](https://img.shields.io/badge/license-BSD--2--Clause-blue.svg)](https://github.com/rryqszq4/ngx_php/blob/master/LICENSE)
+[![QQ group](https://img.shields.io/badge/QQ--group-558795330-26bcf5.svg)](https://github.com/rryqszq4/ngx_php)
 
-[ngx_php](https://github.com/rryqszq4/ngx_php) - Embedded php script language for nginx-module. Another name is nginx-php5-module.   
-QQ Group：558795330
+[ngx_php](https://github.com/rryqszq4/ngx_php) - Embedded php script language for nginx-module. 
+[ngx_php7](https://github.com/rryqszq4/ngx_php7) - Embedded php7 programming language for nginx-module. 
 
 Requirement
 -----------
@@ -25,7 +26,6 @@ $ tar xf php-5.6.30.tar.gz
 $ cd php-5.6.30
 
 $ ./configure --prefix=/path/to/php \
-$             --enable-maintainer-zts \
 $             --enable-embed
 $ make && make install
 ```
@@ -128,7 +128,7 @@ Directives
 
 php_ini_path
 ------------
-* **syntax:** `php_ini_path &lt;php.ini file path&gt;`
+* **syntax:** `php_ini_path` _`php.ini file path`_
 * **context:** `http`
 * **phase:** `loading-config`
 
@@ -140,7 +140,7 @@ php_ini_path /usr/local/php/etc/php.ini;
 
 init_by_php
 -----------
-* **syntax:** `init_by_php &lt;php script code&gt;`
+* **syntax:** `init_by_php` _`php script code`_
 * **context:** `http`
 * **phase:** `loading-config`
 
@@ -148,7 +148,7 @@ In nginx configuration initialization or boot time, run some php scripts.
 
 init_by_php_file
 ----------------
-* **syntax:** `init_by_php_file &lt;php script file&gt;`
+* **syntax:** `init_by_php_file` _`php script file`_
 * **context:** `http`
 * **phase:** `loading-config`
 
@@ -156,7 +156,7 @@ In nginx configuration initialization or boot time, run some php script file.
 
 rewrite_by_php
 --------------
-* **syntax:** `rewrite_by_php &lt;php script code&gt;`
+* **syntax:** `rewrite_by_php` _`php script code`_
 * **context:** `http, server, location, location if`
 * **phase:** `rewrite`
 
@@ -173,7 +173,7 @@ location /rewrite_by_php {
 
 rewrite_by_php_file
 -------------------
-* **syntax:** `rewrite_by_php_file &lt;php script file&gt;`
+* **syntax:** `rewrite_by_php_file` _`php script file`_
 * **context:** `http, server, location, location if`
 * **phase:** `rewrite`
 
@@ -181,7 +181,7 @@ Use php script file, redirect in nginx rewrite stage of.
 
 access_by_php
 -------------
-* **syntax:** `access_by_php &lt;php script code&gt;`
+* **syntax:** `access_by_php` _`php script code`_
 * **context:** `http, server, location, location if`
 * **phase:** `access`
 
@@ -189,7 +189,7 @@ Nginx in the access phase, the php script determine access.
 
 access_by_php_file
 ------------------
-* **syntax:** `access_by_php_file &lt;php script file&gt;`
+* **syntax:** `access_by_php_file` _`php script file`_
 * **context:** `http, server, location, location if`
 * **phase:** `access`
 
@@ -197,7 +197,7 @@ Nginx in the access phase, the php script file Analyzing access.
 
 content_by_php
 --------------
-* **syntax:** `content_by_php &lt;php script code&gt;`
+* **syntax:** `content_by_php` _`php script code`_
 * **context:** `http, server, location, location if`
 * **phase:** `content`
 
@@ -215,7 +215,7 @@ location /content_by_php {
 
 content_by_php_file
 -------------------
-* **syntax:** `content_by_php_file &lt;php script file&gt;` 
+* **syntax:** `content_by_php_file` _`php script file`_
 * **context:** `http, server, location, location if`
 * **phase:** `content`
 
@@ -228,37 +228,37 @@ location /content_by_php_file {
 
 log_by_php
 ----------
-* **syntax:** `log_by_php &lt;php script code&gt;`
+* **syntax:** `log_by_php` _`php script code`_
 * **context:** `http, server, location, location if`
 * **phase:** `log`
 
 log_by_php_file
 ---------------
-* **syntax:** `log_by_php_file &lt;php script file&gt;`
+* **syntax:** `log_by_php_file` _`php script file`_
 * **context:** `http, server, location, location if`
 * **phase:** `log`
 
 set_by_php
 ----------
-* **syntax:** `set_by_php &lt;php script code&gt;`
+* **syntax:** `set_by_php` _`php script code`_
 * **context:** `server, server if, location, location if`
 * **phase:** `content`
 
 set_run_by_php
 --------------
-* **syntax:** `set_run_by_php &lt;php script code&gt;`
+* **syntax:** `set_run_by_php` _`php script code`_
 * **context:** `server, server if, location, location if`
 * **phase:** `content`
 
 set_by_php_file
 ---------------
-* **syntax:** `set_by_php_file &lt;php script file&gt;`
+* **syntax:** `set_by_php_file` _`php script file`_
 * **context:** `server, server if, location, location if`
 * **phase:** `content`
 
 set_run_by_php_file
 -------------------
-* **syntax:** `set_run_by_php_file &lt;php script file&gt;`
+* **syntax:** `set_run_by_php_file` _`php script file`_
 * **context:** `server, server if, location, location if`
 * **phase:** `content`
 
@@ -312,26 +312,9 @@ ngx_log::error(NGX_LOG_ERR, "test");
 */
 ```
 
-Question
---------
-[issues #6](https://github.com/rryqszq4/ngx_php/issues/6) - Using in php-5.3.29, libxml2 2.7.6 not thread safety. Please disable xml in php install.
-```sh
-./configure --prefix=/usr/local/php5329 \
-            --with-config-file-path=/usr/local/php5329/etc \
-            --with-iconv=/usr/local/libiconv \
-            --disable-xml \
-            --disable-libxml \
-            --disable-dom \
-            --disable-simplexml \
-            --disable-xmlreader \
-            --disable-xmlwriter \
-            --without-pear \
-            --enable-maintainer-zts  \
-            --enable-embed
-```
-
 Copyright and License
 ---------------------
+```
 Copyright (c) 2016-2017, rryqszq4 <rryqszq@gmail.com>  
 All rights reserved.
 
@@ -355,3 +338,4 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+```
