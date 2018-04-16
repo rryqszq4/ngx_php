@@ -74,6 +74,10 @@ typedef struct ngx_http_php_loc_conf_s {
 	ngx_int_t (*content_async_handler)(ngx_http_request_t *r);
 	ngx_int_t (*log_handler)(ngx_http_request_t *r);
 
+	unsigned enabled_rewrite_inline_compile:1;
+    unsigned enabled_access_inline_compile:1;
+    unsigned enabled_content_inline_compile:1;
+
 } ngx_http_php_loc_conf_t;
 
 
