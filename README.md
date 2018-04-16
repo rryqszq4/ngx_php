@@ -8,7 +8,7 @@
 [![license](https://img.shields.io/badge/license-BSD--2--Clause-blue.svg)](https://github.com/rryqszq4/ngx_php/blob/master/LICENSE)
 [![QQ group](https://img.shields.io/badge/QQ--group-558795330-26bcf5.svg)](https://github.com/rryqszq4/ngx_php)
 
-[ngx_php](https://github.com/rryqszq4/ngx_php) - Embedded php script language for nginx-module. 
+[ngx_php](https://github.com/rryqszq4/ngx_php) - Embedded php script language for nginx-module.  
 [ngx_php7](https://github.com/rryqszq4/ngx_php7) - Embedded php7 programming language for nginx-module. 
 
 Requirement
@@ -128,7 +128,7 @@ Directives
 
 php_ini_path
 ------------
-* **syntax:** `php_ini_path` _`php.ini file path`_
+* **syntax:** `php_ini_path`_`<php.ini file path>`_
 * **context:** `http`
 * **phase:** `loading-config`
 
@@ -140,7 +140,7 @@ php_ini_path /usr/local/php/etc/php.ini;
 
 init_by_php
 -----------
-* **syntax:** `init_by_php` _`php script code`_
+* **syntax:** `init_by_php`_`<php script code>`_
 * **context:** `http`
 * **phase:** `loading-config`
 
@@ -148,7 +148,7 @@ In nginx configuration initialization or boot time, run some php scripts.
 
 init_by_php_file
 ----------------
-* **syntax:** `init_by_php_file` _`php script file`_
+* **syntax:** `init_by_php_file`_`<php script file>`_
 * **context:** `http`
 * **phase:** `loading-config`
 
@@ -156,7 +156,7 @@ In nginx configuration initialization or boot time, run some php script file.
 
 rewrite_by_php
 --------------
-* **syntax:** `rewrite_by_php` _`php script code`_
+* **syntax:** `rewrite_by_php`_`<php script code>`_
 * **context:** `http, server, location, location if`
 * **phase:** `rewrite`
 
@@ -173,7 +173,7 @@ location /rewrite_by_php {
 
 rewrite_by_php_file
 -------------------
-* **syntax:** `rewrite_by_php_file` _`php script file`_
+* **syntax:** `rewrite_by_php_file`_`<php script file>`_
 * **context:** `http, server, location, location if`
 * **phase:** `rewrite`
 
@@ -181,7 +181,7 @@ Use php script file, redirect in nginx rewrite stage of.
 
 access_by_php
 -------------
-* **syntax:** `access_by_php` _`php script code`_
+* **syntax:** `access_by_php`_`<php script code>`_
 * **context:** `http, server, location, location if`
 * **phase:** `access`
 
@@ -189,7 +189,7 @@ Nginx in the access phase, the php script determine access.
 
 access_by_php_file
 ------------------
-* **syntax:** `access_by_php_file` _`php script file`_
+* **syntax:** `access_by_php_file`_`<php script file>`_
 * **context:** `http, server, location, location if`
 * **phase:** `access`
 
@@ -197,7 +197,7 @@ Nginx in the access phase, the php script file Analyzing access.
 
 content_by_php
 --------------
-* **syntax:** `content_by_php` _`php script code`_
+* **syntax:** `content_by_php`_`<php script code>`_
 * **context:** `http, server, location, location if`
 * **phase:** `content`
 
@@ -215,7 +215,7 @@ location /content_by_php {
 
 content_by_php_file
 -------------------
-* **syntax:** `content_by_php_file` _`php script file`_
+* **syntax:** `content_by_php_file`_`<php script file>`_
 * **context:** `http, server, location, location if`
 * **phase:** `content`
 
@@ -228,37 +228,37 @@ location /content_by_php_file {
 
 log_by_php
 ----------
-* **syntax:** `log_by_php` _`php script code`_
+* **syntax:** `log_by_php`_`<php script code>`_
 * **context:** `http, server, location, location if`
 * **phase:** `log`
 
 log_by_php_file
 ---------------
-* **syntax:** `log_by_php_file` _`php script file`_
+* **syntax:** `log_by_php_file`_`<php script file>`_
 * **context:** `http, server, location, location if`
 * **phase:** `log`
 
 set_by_php
 ----------
-* **syntax:** `set_by_php` _`php script code`_
+* **syntax:** `set_by_php`_`<php script code>`_
 * **context:** `server, server if, location, location if`
 * **phase:** `content`
 
 set_run_by_php
 --------------
-* **syntax:** `set_run_by_php` _`php script code`_
+* **syntax:** `set_run_by_php`_`<php script code>`_
 * **context:** `server, server if, location, location if`
 * **phase:** `content`
 
 set_by_php_file
 ---------------
-* **syntax:** `set_by_php_file` _`php script file`_
+* **syntax:** `set_by_php_file`_`<php script file>`_
 * **context:** `server, server if, location, location if`
 * **phase:** `content`
 
 set_run_by_php_file
 -------------------
-* **syntax:** `set_run_by_php_file` _`php script file`_
+* **syntax:** `set_run_by_php_file`_`<php script file>`_
 * **context:** `server, server if, location, location if`
 * **phase:** `content`
 
