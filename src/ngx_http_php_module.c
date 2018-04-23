@@ -480,7 +480,7 @@ ngx_http_php_init_worker(ngx_cycle_t *cycle)
 	old_zend_error_cb = zend_error_cb;
 	zend_error_cb = ngx_php_error_cb;
 
-	TSRMLS_FETCH();
+
 	php_ngx_request_init(TSRMLS_C);
 	
 	php_ngx_core_init(0 TSRMLS_CC);
@@ -492,7 +492,7 @@ ngx_http_php_init_worker(ngx_cycle_t *cycle)
 static void 
 ngx_http_php_exit_worker(ngx_cycle_t *cycle)
 {
-	TSRMLS_FETCH();
+	//TSRMLS_FETCH();
 
 	php_ngx_request_shutdown(TSRMLS_C);
 	php_ngx_module_shutdown(TSRMLS_C);

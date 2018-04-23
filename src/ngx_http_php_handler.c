@@ -25,7 +25,7 @@ static void ngx_http_php_content_file_uthread_routine(void *data);
 ngx_int_t
 ngx_http_php_post_read_handler(ngx_http_request_t *r)
 {
-	TSRMLS_FETCH();
+	//TSRMLS_FETCH();
 	
 	ngx_http_php_ctx_t *ctx;
 	
