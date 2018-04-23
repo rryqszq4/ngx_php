@@ -13,13 +13,11 @@
 
 #include "php/php_ngx.h"
 #include "php/php_ngx_core.h"
-#include "php/php_ngx_generator.h"
 #include "php/php_ngx_log.h"
 
 #include "ngx_http_php_module.h"
 #include "ngx_http_php_directive.h"
 #include "ngx_http_php_handler.h"
-#include "ngx_http_php_thread_handler.h"
 
 // http init
 static ngx_int_t ngx_http_php_init(ngx_conf_t *cf);
@@ -247,6 +245,7 @@ ngx_module_t ngx_http_php_module = {
 	NGX_MODULE_V1_PADDING
 };
 
+/*
 static ngx_str_t  ngx_http_php_hide_headers[] = {
     ngx_string("Date"),
     ngx_string("Server"),
@@ -258,6 +257,7 @@ static ngx_str_t  ngx_http_php_hide_headers[] = {
     ngx_string("X-Accel-Charset"),
     ngx_null_string
 };
+*/
 
 static ngx_int_t 
 ngx_http_php_init(ngx_conf_t *cf)
@@ -364,11 +364,6 @@ ngx_http_php_create_main_conf(ngx_conf_t *cf)
 		return NULL;
 	}
 
-	//-> alloc array thread_pools
-	if (ngx_array_init(&pmcf->thread_pools, cf->pool, 4, sizeof(ngx_php_thread_pool_t *)) != NGX_OK) {
-		return NULL;
-	}
-
 	pmcf->state = ngx_pcalloc(cf->pool, sizeof(ngx_http_php_state_t));
 	if (pmcf->state == NULL){
 		return NULL;
@@ -387,40 +382,6 @@ ngx_http_php_create_main_conf(ngx_conf_t *cf)
 static char *
 ngx_http_php_init_main_conf(ngx_conf_t *cf, void *conf)
 {
-	/*ngx_http_php_main_conf_t *pmcf = conf;
-
-	//ngx_uint_t i;
-	ngx_php_thread_pool_t  *tp, **tpp;
-
-	//tpp = pmcf->thread_pools.elts;
-
-	tp = ngx_pcalloc(cf->pool, sizeof(ngx_php_thread_pool_t));
-	if (tp == NULL) {
-		return NULL;
-	}
-
-	tp->name = (ngx_str_t) ngx_string("ngx_php tp");
-	tp->threads = 32;
-	tp->max_queue = 65536;
-
-	tpp = ngx_array_push(&pmcf->thread_pools);
-	if (tpp == NULL) {
-		return NULL;
-	}
-
-	*tpp = tp;*/
-
-	//ngx_conf_log_error(NGX_LOG_EMERG, cf, 0, "%d", pmcf->thread_pools.nelts);
-
-	/*for (i = 0; i < pmcf->thread_pools.nelts; i++) {
-		if (tpp[i]->threads) {
-			continue;
-		}
-
-		tpp[i]->threads = 32;
-		tpp[i]->max_queue = 65536;
-	}*/
-
 	return NGX_CONF_OK;
 }
 
@@ -450,31 +411,9 @@ ngx_http_php_create_loc_conf(ngx_conf_t *cf)
 	plcf->log_code = NGX_CONF_UNSET_PTR;
 	plcf->log_inline_code = NGX_CONF_UNSET_PTR;
 
-	plcf->upstream.connect_timeout = 60000;
-    plcf->upstream.send_timeout = 60000;
-    plcf->upstream.read_timeout = 60000;
-    plcf->upstream.store_access = 0600;
-
-    plcf->upstream.buffering = 1;
-    plcf->upstream.bufs.num = 8;
-    plcf->upstream.bufs.size = ngx_pagesize;
-    plcf->upstream.buffer_size = ngx_pagesize;
-    plcf->upstream.busy_buffers_size = 2 * ngx_pagesize;
-    plcf->upstream.temp_file_write_size = 2 * ngx_pagesize;
-    plcf->upstream.max_temp_file_size = 1024 * 1024 * 1024;
-
-    plcf->upstream.hide_headers = NGX_CONF_UNSET_PTR;
-    plcf->upstream.pass_headers = NGX_CONF_UNSET_PTR;
-
-    //plcf->upstream.ignore_client_abort = 1;
-
-    //-> feature: upstream connection pool
-    /*plcf->upstream.upstream = ngx_pcalloc(cf->pool,
-                       sizeof(ngx_http_upstream_srv_conf_t));
-
-    if (plcf->upstream.upstream == NULL) {
-    	return NGX_CONF_ERROR;
-    }*/
+	plcf->enabled_rewrite_inline_compile = 0;
+    plcf->enabled_access_inline_compile = 0;
+    plcf->enabled_content_inline_compile = 0;
 
 	return plcf;
 }
@@ -505,17 +444,9 @@ ngx_http_php_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child)
 	prev->log_code = conf->log_code;
 	prev->log_inline_code = conf->log_inline_code;
 
-	ngx_hash_init_t		hash;
-	hash.max_size = 512;
-	hash.bucket_size = 1024;
-	hash.name = "ngx_php_headers_hash";
-
-	if (ngx_http_upstream_hide_headers_hash(cf, &conf->upstream,
-            &prev->upstream, ngx_http_php_hide_headers, &hash)
-        != NGX_OK)
-    {
-        return NGX_CONF_ERROR;
-    }
+	prev->enabled_rewrite_inline_compile = conf->enabled_rewrite_inline_compile;
+    prev->enabled_access_inline_compile = conf->enabled_access_inline_compile;
+    prev->enabled_content_inline_compile = conf->enabled_content_inline_compile;
 
 	return NGX_CONF_OK;
 }
@@ -524,30 +455,14 @@ static ngx_int_t
 ngx_http_php_init_worker(ngx_cycle_t *cycle)
 {
 	//TSRMLS_FETCH();
-	/*ngx_uint_t					i;
-	ngx_php_thread_pool_t 		**tpp;*/
+
 	ngx_http_php_main_conf_t 	*pmcf;
 
 	pmcf = ngx_http_cycle_get_module_main_conf(cycle, ngx_http_php_module);
 
-	//-> init run thread_pool
-	ngx_php_thread_pool_queue_init(&ngx_php_thread_pool_done);
-	ngx_php_thread_pool_queue_init(&ngx_php_thread_pool_running);
-
-	//ngx_log_error(NGX_LOG_ERR, cycle->log, 0, "thread pool done %p", &ngx_php_thread_pool_done);
-	//ngx_log_error(NGX_LOG_ERR, cycle->log, 0, "thread pool running %p", &ngx_php_thread_pool_running);
-
-	/*tpp = pmcf->thread_pools.elts;
-
-	for (i = 0; i < pmcf->thread_pools.nelts; i++) {
-		if (ngx_php_thread_pool_init(tpp[i], cycle->log, cycle->pool) != NGX_OK) {
-			return NGX_ERROR;
-		}
-	}*/
-
 	//-> init run php
 	php_ngx_module.ub_write = ngx_http_php_code_ub_write;
-	php_ngx_module.flush = ngx_http_php_code_flush;
+	//php_ngx_module.flush = ngx_http_php_code_flush;
 	//php_ngx_module.log_message = ngx_http_php_code_log_message;
 	//php_ngx_module.register_server_variables = ngx_http_php_code_register_server_variables;
 	//php_ngx_module.read_post = ngx_http_php_code_read_post;
@@ -569,7 +484,6 @@ ngx_http_php_init_worker(ngx_cycle_t *cycle)
 	php_ngx_request_init(TSRMLS_C);
 	
 	php_ngx_core_init(0 TSRMLS_CC);
-	php_ngx_generator_init(0 TSRMLS_CC);
 	php_ngx_log_init(0 TSRMLS_CC);
 
 	return NGX_OK;
@@ -580,20 +494,9 @@ ngx_http_php_exit_worker(ngx_cycle_t *cycle)
 {
 	TSRMLS_FETCH();
 
-	ngx_uint_t 					i;
-	ngx_php_thread_pool_t 		**tpp;
-	ngx_http_php_main_conf_t 	*pmcf;
-
-	pmcf = ngx_http_cycle_get_module_main_conf(cycle, ngx_http_php_module);
-
 	php_ngx_request_shutdown(TSRMLS_C);
 	php_ngx_module_shutdown(TSRMLS_C);
 
-	tpp = pmcf->thread_pools.elts;
-
-	for (i = 0; i < pmcf->thread_pools.nelts; i++) {
-		ngx_php_thread_pool_destroy(tpp[i]);
-	}
 }
 
 

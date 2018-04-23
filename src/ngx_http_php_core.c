@@ -1,5 +1,5 @@
 /**
- *    Copyright(c) 2016-2017 rryqszq4
+ *    Copyright(c) 2016-2018 rryqszq4
  *
  *
  */
@@ -7,6 +7,7 @@
 #include "ngx_http_php_module.h"
 #include "ngx_http_php_request.h"
 #include "ngx_http_php_core.h"
+#include "ngx_http_php_zend_uthread.h"
 
 ngx_http_php_code_t *
 ngx_http_php_code_from_file(ngx_pool_t *pool, ngx_str_t *code_file_path)
@@ -38,6 +39,19 @@ ngx_http_php_code_from_file(ngx_pool_t *pool, ngx_str_t *code_file_path)
 		ngx_cpystrn(p, (u_char *)code_file_path->data, code_file_path->len + 1);
 	}
 	code->code_type = NGX_HTTP_PHP_CODE_TYPE_FILE;
+	
+	//code->code_id.data = ngx_pnalloc(pool, sizeof("18446744073709551616")-1+NGX_TIME_T_LEN);
+    //code->code_id.len = ngx_sprintf(code->code_id.data, "%ul%T", ngx_random(), ngx_time()) - code->code_id.data;
+
+    code->code_id.len = 32;
+    code->code_id.data = ngx_pnalloc(pool, 32);
+    if (code->code_id.data == NULL) {
+        return NGX_CONF_UNSET_PTR;
+    }
+    ngx_sprintf(code->code_id.data, "%08xD%08xD%08xD%08xD",
+                (uint32_t) ngx_random(), (uint32_t) ngx_random(),
+                (uint32_t) ngx_random(), (uint32_t) ngx_random());
+
 	return code;
 }
 
@@ -59,6 +73,19 @@ ngx_http_php_code_from_string(ngx_pool_t *pool, ngx_str_t *code_str)
 	}
 	ngx_cpystrn((u_char *)code->code.string, code_str->data, len + 1);
 	code->code_type = NGX_HTTP_PHP_CODE_TYPE_STRING;
+
+	//code->code_id.data = ngx_pnalloc(pool, sizeof("18446744073709551616")-1+NGX_TIME_T_LEN);
+    //code->code_id.len = ngx_sprintf(code->code_id.data, "%ul%T", ngx_random(), ngx_time()) - code->code_id.data;
+
+    code->code_id.len = 32;
+    code->code_id.data = ngx_pnalloc(pool, 32);
+    if (code->code_id.data == NULL) {
+        return NGX_CONF_UNSET_PTR;
+    }
+    ngx_sprintf(code->code_id.data, "%08xD%08xD%08xD%08xD",
+                (uint32_t) ngx_random(), (uint32_t) ngx_random(),
+                (uint32_t) ngx_random(), (uint32_t) ngx_random());
+
 	return code;
 }
 
@@ -187,8 +214,8 @@ ngx_php_error_cb(int type,
 		u_char *u_str;
 		ngx_str_t ns;
 
-		//r = ngx_php_request;
-		r = PHP_NGX_G(global_r);
+		r = ngx_php_request;
+		//r = PHP_NGX_G(global_r);
 		ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
 
 		ns.data = (u_char *)buffer;
@@ -225,6 +252,8 @@ ngx_php_error_cb(int type,
 		//ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "ngx_php_error: %s %s", error_filename, buffer);
 		ngx_log_error(NGX_LOG_ERR, r->connection->log, 0, "{! %s: %s in %s on line %d !}\n", error_type_str, buffer, error_filename, error_lineno);
 		
+		ngx_http_php_zend_uthread_exit(r);
+
 		efree(buffer);
 		zend_bailout();
 		return ;
@@ -248,8 +277,7 @@ int ngx_http_php_code_ub_write(const char *str, unsigned int str_length TSRMLS_D
 	u_char *u_str;
 	ngx_str_t ns;
 
-	//r = ngx_php_request;
-	r = PHP_NGX_G(global_r);
+	r = ngx_php_request;
 	ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
 
 	ns.data = (u_char *)str;
