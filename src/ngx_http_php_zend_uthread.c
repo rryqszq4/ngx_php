@@ -168,18 +168,26 @@ ngx_http_php_zend_uthread_create(ngx_http_request_t *r, char *func_prefix)
 
     func_name.data = ngx_pnalloc(r->pool, strlen(func_prefix) + 32);
 
-    func_name.len = ngx_sprintf(func_name.data, "%s_%V", func_prefix, &(plcf->content_inline_code->code_id)) - func_name.data;
-
+    if (strcmp(func_prefix, "ngx_rewrite") == 0) {
+        func_name.len = ngx_sprintf(func_name.data, "%s_%V", func_prefix, &(plcf->rewrite_inline_code->code_id)) - func_name.data;
+    }else if (strcmp(func_prefix, "ngx_access") == 0) {
+        func_name.len = ngx_sprintf(func_name.data, "%s_%V", func_prefix, &(plcf->access_inline_code->code_id)) - func_name.data;
+    }else if (strcmp(func_prefix, "ngx_content") == 0) {
+        func_name.len = ngx_sprintf(func_name.data, "%s_%V", func_prefix, &(plcf->content_inline_code->code_id)) - func_name.data;
+    }else {
+        func_name.len = 0;
+    }
 
     ngx_php_debug("%*s", (int)func_name.len, func_name.data);
 
+    MAKE_STD_ZVAL(func_main);
     ZVAL_STRINGL(func_main, (char *)func_name.data, func_name.len, 1);
     call_user_function(EG(function_table), NULL, func_main, ctx->generator_closure, 0, NULL TSRMLS_CC);
     zval_ptr_dtor(&func_main);
 
     if (Z_TYPE_P(ctx->generator_closure) == IS_OBJECT){
     	MAKE_STD_ZVAL(func_valid);
-        ZVAL_STRING(&func_valid, "valid", 1);
+        ZVAL_STRING(func_valid, "valid", 1);
         if (call_user_function(NULL, &(ctx->generator_closure), func_valid, &retval, 0, NULL TSRMLS_CC) == FAILURE)
         {
             php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed calling valid");
