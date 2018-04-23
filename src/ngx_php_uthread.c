@@ -17,6 +17,7 @@ ngx_php_uthread_routine(ngx_php_uthread_t *uthread)
 ngx_int_t 
 ngx_php_uthread_create(ngx_php_uthread_t *uthread)
 {
+    uthread->stack = malloc(PHP_UTHREAD_STACK_SIZE);
 
     if (getcontext(&uthread->child) == -1) {
         return -1;
@@ -64,6 +65,13 @@ ngx_php_uthread_resume(ngx_php_uthread_t *uthread)
     return 0;
 }
 
+ngx_int_t 
+ngx_php_uthread_destroy(ngx_php_uthread_t *uthread)
+{
+    free(uthread->stack);
+    uthread->stack = NULL;
+    return 0;
+}
 
 ngx_uint_t 
 ngx_php_uthread_id(ngx_php_uthread_t *uthread)
