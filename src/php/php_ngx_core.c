@@ -26,13 +26,6 @@ ngx_execute_internal(zend_execute_data *execute_data_ptr, zend_fcall_info *fci, 
 
     execute_internal(execute_data_ptr, fci, return_value_used TSRMLS_CC);
 
-    ngx_http_request_t *r = ngx_php_request;
-    ngx_http_php_ctx_t *ctx;
-    ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
-
-    ngx_php_debug("%p, %p\n", ctx->ori_stack, EG(argument_stack));
-
-
 }
 
 static zend_class_entry *php_ngx_class_entry;
