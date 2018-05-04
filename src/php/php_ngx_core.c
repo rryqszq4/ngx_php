@@ -9,7 +9,6 @@
 #include "php_ngx_log.h"
 #include "../ngx_http_php_module.h"
 #include "../ngx_http_php_sleep.h"
-#include "../ngx_php_uthread.h"
 
 void ngx_execute_ex(zend_execute_data *execute_data TSRMLS_DC)
 {

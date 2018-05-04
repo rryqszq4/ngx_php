@@ -19,7 +19,6 @@
 
 #include "ngx_php_thread.h"
 #include "ngx_php_thread_pool.h"
-#include "ngx_php_uthread.h"
 
 #include "ngx_http_php_core.h"
 
