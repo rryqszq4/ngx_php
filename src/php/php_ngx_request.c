@@ -1,10 +1,10 @@
 /**
- *    Copyright(c) 2016-2017 rryqszq4
+ *    Copyright(c) 2016-2018 rryqszq4
  *
  *
  */
 
-#include "php_ngx_log.h"
+#include "php_ngx_request.h"
 #include "../ngx_http_php_module.h"
 
 static zend_class_entry *php_ngx_request_class_entry;
@@ -90,12 +90,12 @@ PHP_METHOD(ngx_request, document_uri)
     if ((r->uri.data)[r->uri.len-1] == '/') {
         char *tmp_uri;
         tmp_uri = emalloc(r->uri.len + 9 + 1);
-        ngx_cpystrn((u_char *)tmp_uri, (u_char *)r->uri.data, r->uri.len, 1);
+        ngx_cpystrn((u_char *)tmp_uri, (u_char *)r->uri.data, r->uri.len + 1);
         strncat(tmp_uri, "index.php", 9);
         ZVAL_STRINGL(return_value, (char *)tmp_uri, r->uri.len + 9, 1);
         efree(tmp_uri);
     } else {
-        ZVAL_STRINGL(return_value, (char *)r->uri.data, r->uri.len);
+        ZVAL_STRINGL(return_value, (char *)r->uri.data, r->uri.len, 1);
     }
 }
 
