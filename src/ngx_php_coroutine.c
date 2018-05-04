@@ -17,7 +17,9 @@ ngx_php_coroutine_routine(ngx_php_coroutine_t *coroutine)
 ngx_int_t 
 ngx_php_coroutine_create(ngx_php_coroutine_t *coroutine)
 {
-    coroutine->stack = malloc(PHP_COROUTINE_STACK_SIZE);
+    if (!coroutine->stack) {
+        return -1;
+    }
 
 	if (getcontext(&coroutine->child) == -1) {
 		return -1;
@@ -67,8 +69,6 @@ ngx_php_coroutine_resume(ngx_php_coroutine_t *coroutine)
 ngx_int_t 
 ngx_php_coroutine_destroy(ngx_php_coroutine_t *coroutine)
 {
-    free(coroutine->stack);
-    coroutine->stack = NULL;
     return 0;
 }
 

@@ -4,9 +4,36 @@
  *
  */
 
+#include "../ngx_php_debug.h"
+#include "php_ngx_core.h"
 #include "php_ngx_log.h"
 #include "../ngx_http_php_module.h"
 #include "../ngx_http_php_sleep.h"
+#include "../ngx_php_uthread.h"
+
+void ngx_execute_ex(zend_execute_data *execute_data TSRMLS_DC)
+{
+    ngx_php_debug("start");
+    ori_execute_ex(execute_data TSRMLS_CC);
+
+    ngx_php_debug("EG(argument_stack): %p", EG(argument_stack));
+    ngx_php_debug("end");
+}
+
+void 
+ngx_execute_internal(zend_execute_data *execute_data_ptr, zend_fcall_info *fci, int return_value_used TSRMLS_DC)
+{
+
+    execute_internal(execute_data_ptr, fci, return_value_used TSRMLS_CC);
+
+    ngx_http_request_t *r = ngx_php_request;
+    ngx_http_php_ctx_t *ctx;
+    ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
+
+    ngx_php_debug("%p, %p\n", ctx->ori_stack, EG(argument_stack));
+
+
+}
 
 static zend_class_entry *php_ngx_class_entry;
 static zend_class_entry *php_co_ngx_class_entry;
@@ -20,6 +47,10 @@ ZEND_BEGIN_ARG_INFO_EX(ngx_query_args_arginfo, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(ngx_sleep_arginfo, 0, 0, 1)
+    ZEND_ARG_INFO(0, time)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(ngx_cosleep_arginfo, 0, 0, 1)
     ZEND_ARG_INFO(0, time)
 ZEND_END_ARG_INFO()
 
@@ -74,6 +105,29 @@ PHP_METHOD(ngx, sleep)
 
 }
 
+PHP_METHOD(ngx, cosleep)
+{
+    ngx_http_request_t *r;
+    ngx_http_php_ctx_t *ctx;
+    long time;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &time) == FAILURE) {
+        RETURN_NULL();
+    }
+
+    r = ngx_php_request;
+    ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
+
+    if (ctx == NULL) {
+
+    }
+
+    ctx->delay_time = time * 1000;
+
+    ngx_http_php_cosleep(r);
+
+}
+
 /*
 PHP_METHOD(co_ngx, sleep)
 {
@@ -103,6 +157,7 @@ PHP_METHOD(co_ngx, sleep)
 static const zend_function_entry php_ngx_class_functions[] = {
     PHP_ME(ngx, _exit, ngx_exit_arginfo, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
     PHP_ME(ngx, sleep, ngx_sleep_arginfo, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+    PHP_ME(ngx, cosleep, ngx_cosleep_arginfo, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
     {NULL, NULL, NULL, 0, 0}
 };
 

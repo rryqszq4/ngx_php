@@ -9,11 +9,14 @@
 #include "ngx_http_php_zend_uthread.h"
 
 void 
-ngx_http_php_zend_uthread_rewrite_inline_routine(ngx_http_request_t *r)
+ngx_http_php_zend_uthread_rewrite_inline_routine(void *data)
 {
+    ngx_http_request_t *r;
     ngx_http_php_ctx_t *ctx;
     ngx_http_php_loc_conf_t *plcf;
     ngx_str_t inline_code;
+
+    r = data;
 
     plcf = ngx_http_get_module_loc_conf(r, ngx_http_php_module);
     ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
@@ -51,14 +54,19 @@ ngx_http_php_zend_uthread_rewrite_inline_routine(ngx_http_request_t *r)
         ngx_http_php_zend_uthread_create(r, "ngx_rewrite");
 
     }zend_end_try();
+
+    ctx->phase_status = NGX_OK;
 }
 
 void 
-ngx_http_php_zend_uthread_access_inline_routine(ngx_http_request_t *r)
+ngx_http_php_zend_uthread_access_inline_routine(void *data)
 {
+    ngx_http_request_t *r;
     ngx_http_php_ctx_t *ctx;
     ngx_http_php_loc_conf_t *plcf;
     ngx_str_t inline_code;
+
+    r = data;
 
     plcf = ngx_http_get_module_loc_conf(r, ngx_http_php_module);
     ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
@@ -96,14 +104,19 @@ ngx_http_php_zend_uthread_access_inline_routine(ngx_http_request_t *r)
         ngx_http_php_zend_uthread_create(r, "ngx_access");
 
     }zend_end_try();
+
+    ctx->phase_status = NGX_OK;
 }
 
 void 
-ngx_http_php_zend_uthread_content_inline_routine(ngx_http_request_t *r)
+ngx_http_php_zend_uthread_content_inline_routine(void *data)
 {
+    ngx_http_request_t *r;
     ngx_http_php_ctx_t *ctx;
     ngx_http_php_loc_conf_t *plcf;
     ngx_str_t inline_code;
+
+    r = data;
 
     plcf = ngx_http_get_module_loc_conf(r, ngx_http_php_module);
     ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
@@ -141,6 +154,9 @@ ngx_http_php_zend_uthread_content_inline_routine(ngx_http_request_t *r)
         ngx_http_php_zend_uthread_create(r, "ngx_content");
     
     }zend_end_try();
+
+    ctx->phase_status = NGX_OK;
+    //ngx_http_core_run_phases(r);
 }
 
 void 
@@ -230,7 +246,7 @@ ngx_http_php_zend_uthread_resume(ngx_http_request_t *r)
 
         closure = ctx->generator_closure;
 
-        MAKE_STD_ZVAL(func_valid);
+        MAKE_STD_ZVAL(func_next);
         ZVAL_STRING(func_next, "next", 1);
         call_user_function(NULL, &(closure), func_next, &retval, 0, NULL TSRMLS_CC);
         zval_ptr_dtor(&func_next);
@@ -254,6 +270,20 @@ ngx_http_php_zend_uthread_resume(ngx_http_request_t *r)
     }zend_catch {
 
     }zend_end_try();
+}
+
+void 
+ngx_http_php_zend_uthread_continue(ngx_http_request_t *r)
+{
+    ngx_http_php_ctx_t *ctx;
+
+    ngx_php_request = r;
+    ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
+    ctx->phase_status = NGX_OK;
+
+    ngx_http_core_run_phases(r);
+    ngx_php_debug("zend_uthread_continue");
+
 }
 
 void 

@@ -10,6 +10,7 @@
 #include <ngx_http.h>
 #include <php_embed.h>
 #include "php/php_ngx.h"
+#include "ngx_php_coroutine.h"
 
 extern ngx_http_request_t *ngx_php_request;
 
@@ -88,6 +89,15 @@ typedef struct ngx_http_php_ctx_s {
 	void **uthread_ctx;
 
 	zval *generator_closure;
+
+	ngx_php_coroutine_t *coro;
+	zend_execute_data *execute_data;
+	zend_op **opline_ptr;
+	zend_op_array *op_array;
+	HashTable *symbol_table;
+	zend_vm_stack argument_stack;
+	zend_vm_stack ori_stack;
+	zval **return_value_ptr_ptr;
 	
 } ngx_http_php_ctx_t;
 

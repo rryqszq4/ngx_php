@@ -24,7 +24,7 @@ PHP_METHOD(ngx_log, error)
         RETURN_NULL();
     }
 
-    ngx_http_request_t *r = PHP_NGX_G(global_r);
+    ngx_http_request_t *r = ngx_php_request;
 
     ngx_log_error((ngx_uint_t)level, r->connection->log, 0, "%*s", log_len, log_str);
 }
