@@ -50,11 +50,13 @@ ngx_http_php_coroutine_run(ngx_http_request_t *r)
 ngx_int_t 
 ngx_http_php_coroutine_yield(ngx_http_request_t *r)
 {
+	ngx_php_request = r;
+
 	ngx_http_php_ctx_t *ctx;
 
 	ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
 
-	zend_execute_data *current_execute_data = EG(current_execute_data);
+	/*zend_execute_data *current_execute_data = EG(current_execute_data);
     zend_op **opline_ptr;
     opline_ptr = EG(opline_ptr);
     zend_vm_stack current_stack = EG(argument_stack);
@@ -66,13 +68,13 @@ ngx_http_php_coroutine_yield(ngx_http_request_t *r)
     EG(current_execute_data) = current_execute_data;
     EG(opline_ptr) = opline_ptr;
     ctx->argument_stack = EG(argument_stack);
-    EG(argument_stack) = current_stack;
+    EG(argument_stack) = current_stack;*/
 
 	if (ngx_php_coroutine_yield(ctx->coro) != 0) {
 		return NGX_ERROR;
 	}
 
-	r = ngx_php_request;
+	/*r = ngx_php_request;
 
     ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
 
@@ -81,7 +83,7 @@ ngx_http_php_coroutine_yield(ngx_http_request_t *r)
     EG(argument_stack) = ctx->argument_stack;
     EG(return_value_ptr_ptr) = ctx->return_value_ptr_ptr;
     ctx->op_array->fn_flags &= ~ZEND_ACC_GENERATOR;
-    ngx_php_debug("%d\n", ctx->op_array->fn_flags);
+    ngx_php_debug("%d\n", ctx->op_array->fn_flags);*/
 
 	return NGX_OK;
 }

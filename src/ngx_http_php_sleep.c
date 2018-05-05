@@ -171,21 +171,25 @@ ngx_http_php_cosleep(ngx_http_request_t *r)
 
     r->keepalive = 0;
 
-    /*
     zend_execute_data *current_execute_data = EG(current_execute_data);
     zend_op **opline_ptr;
     opline_ptr = EG(opline_ptr);
     zend_vm_stack current_stack = EG(argument_stack);
     //ctx->op_array = (zend_op_array*)emalloc(sizeof(zend_op_array));
     ctx->op_array = EG(active_op_array);
-    ngx_php_debug("%d\n", ctx->op_array->fn_flags);
+    ngx_php_debug("%p\n", ctx->op_array);
+    ctx->return_value_ptr_ptr = EG(return_value_ptr_ptr);
+
     ctx->op_array->fn_flags |= ZEND_ACC_GENERATOR;
     ctx->execute_data = zend_create_execute_data_from_op_array(ctx->op_array, 0 TSRMLS_CC);
     EG(current_execute_data) = current_execute_data;
     EG(opline_ptr) = opline_ptr;
     ctx->argument_stack = EG(argument_stack);
     EG(argument_stack) = current_stack;
-    */
+    ctx->opline_ptr = *EG(opline_ptr);
+    EG(opline_ptr) = opline_ptr;
+    ctx->op_array->fn_flags &= ~ZEND_ACC_GENERATOR;
+    //EG(active_op_array) = ctx->op_array;
 
     //ctx->ori_stack = EG(argument_stack);
     //ctx->execute_data = EG(current_execute_data);
@@ -225,27 +229,34 @@ ngx_http_php_cosleep(ngx_http_request_t *r)
         EG(active_symbol_table)
         );
     */
-    /*zend_op_array op_array;
+    zend_op_array op_array;
     zend_op op;
     int i;
     op_array = *ctx->execute_data->op_array;
     for (i = 0; i < (int)op_array.last; i++) {
         op = op_array.opcodes[i];
         php_printf("|        [%d].opcode = %p(%s)\n", i, &op_array.opcodes[i], zend_get_opcode_name(op.opcode));
-                } */
+                } 
     ngx_http_php_coroutine_yield(r);
-    /*
+
     r = ngx_php_request;
 
     ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
 
-    ctx->execute_data->opline++;
+    //ctx->execute_data->opline++;
     EG(current_execute_data) = ctx->execute_data;
     EG(argument_stack) = ctx->argument_stack;
+    EG(opline_ptr) = &(ctx->opline_ptr);
     EG(return_value_ptr_ptr) = ctx->return_value_ptr_ptr;
-    ctx->op_array->fn_flags &= ~ZEND_ACC_GENERATOR;
-    ngx_php_debug("%d\n", ctx->op_array->fn_flags);
-    */
+    //ctx->op_array->fn_flags &= ~ZEND_ACC_GENERATOR;
+    EG(active_op_array) = ctx->op_array;
+    ngx_php_debug("%p, %p, %s, %p\n", ctx->op_array, *EG(opline_ptr), 
+        zend_get_opcode_name((*EG(opline_ptr))->opcode), ctx->execute_data->opline);
+    op_array = *ctx->execute_data->op_array;
+    for (i = 0; i < (int)op_array.last; i++) {
+        op = op_array.opcodes[i];
+        ngx_php_debug("|        [%d].opcode = %p(%s)\n", i, &op_array.opcodes[i], zend_get_opcode_name(op.opcode));
+                } 
     //EG(active_op_array) = ctx->op_array;
     //EG(active_symbol_table) = ctx->symbol_table;
     //ngx_php_debug("EG(argument_stack): %p, %p, %p, %s", EG(argument_stack), ctx->ori_stack, 
@@ -299,6 +310,7 @@ ngx_http_php_cosleep_handler(ngx_event_t *ev)
         EG(active_op_array),
         EG(current_execute_data)->symbol_table
     );*/
+    ngx_php_debug("coroutine ready. %p", r);
     ngx_http_php_coroutine_resume(r);
 
     ngx_php_debug("coroutine resume");
