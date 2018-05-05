@@ -280,7 +280,7 @@ ngx_http_php_zend_uthread_continue(ngx_http_request_t *r)
     ngx_php_request = r;
     ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
     ctx->phase_status = NGX_OK;
-    ngx_php_debug("zend_uthread_continue s");
+    
     ngx_http_core_run_phases(r);
 
 }
