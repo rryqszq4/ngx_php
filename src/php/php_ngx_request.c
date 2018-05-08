@@ -55,7 +55,7 @@ PHP_METHOD(ngx_request, method)
 {
     ngx_http_request_t *r;
 
-    r = PHP_NGX_G(global_r);
+    r = ngx_php_request;
 
     if (r->method == NGX_HTTP_GET) {
         ZVAL_STRINGL(return_value, (char *)"GET", sizeof("GET") - 1, 1);
@@ -75,7 +75,7 @@ PHP_METHOD(ngx_request, document_root)
     ngx_http_request_t *r;
     ngx_http_php_loc_conf_t *plcf;
 
-    r = PHP_NGX_G(global_r);
+    r = ngx_php_request;
     plcf = ngx_http_get_module_loc_conf(r, ngx_http_php_module);
 
     ZVAL_STRINGL(return_value, (char *)plcf->document_root.data, plcf->document_root.len, 1);
@@ -85,7 +85,7 @@ PHP_METHOD(ngx_request, document_uri)
 {
     ngx_http_request_t *r;
 
-    r = PHP_NGX_G(global_r);
+    r = ngx_php_request;
 
     if ((r->uri.data)[r->uri.len-1] == '/') {
         char *tmp_uri;
@@ -103,7 +103,7 @@ PHP_METHOD(ngx_request, script_name)
 {
     ngx_http_request_t *r;
 
-    r = PHP_NGX_G(global_r);
+    r = ngx_php_request;
 
     if ((r->uri.data)[r->uri.len-1] == '/') {
         ZVAL_NULL(return_value);
@@ -117,7 +117,7 @@ PHP_METHOD(ngx_request, script_filename)
     ngx_http_request_t *r;
     ngx_http_php_loc_conf_t *plcf;
 
-    r = PHP_NGX_G(global_r);
+    r = ngx_php_request;
     plcf = ngx_http_get_module_loc_conf(r, ngx_http_php_module);
 
     if ((r->uri.data)[r->uri.len-1] == '/'){
@@ -142,7 +142,7 @@ PHP_METHOD(ngx_request, query_string)
 {
     ngx_http_request_t *r;
 
-    r = PHP_NGX_G(global_r);
+    r = ngx_php_request;
 
     if (r->args.len > 0){
         ZVAL_STRINGL(return_value, (char *)r->args.data, r->args.len, 1);
@@ -155,7 +155,7 @@ PHP_METHOD(ngx_request, request_uri)
 {
     ngx_http_request_t *r;
 
-    r = PHP_NGX_G(global_r);
+    r = ngx_php_request;
 
     ZVAL_STRINGL(return_value, (char *)r->uri_start, strlen((char *)r->uri_start)-strlen((char *)r->uri_end), 1);
 }
@@ -164,7 +164,7 @@ PHP_METHOD(ngx_request, server_protocol)
 {
     ngx_http_request_t *r;
 
-    r = PHP_NGX_G(global_r);
+    r = ngx_php_request;
 
     ZVAL_STRINGL(return_value, (char *)r->http_protocol.data, r->http_protocol.len, 1);
 }
@@ -173,7 +173,7 @@ PHP_METHOD(ngx_request, remote_addr)
 {
     ngx_http_request_t *r;
 
-    r = PHP_NGX_G(global_r);
+    r = ngx_php_request;
 
     ZVAL_STRINGL(return_value, (char *)r->connection->addr_text.data, r->connection->addr_text.len, 1);
 }
@@ -184,7 +184,7 @@ PHP_METHOD(ngx_request, server_addr)
     ngx_str_t  server_address;
     u_char     server_addr[NGX_SOCKADDR_STRLEN];
 
-    r = PHP_NGX_G(global_r);
+    r = ngx_php_request;
     server_address.len = NGX_SOCKADDR_STRLEN;
     server_address.data = server_addr;
 
@@ -202,7 +202,7 @@ PHP_METHOD(ngx_request, remote_port)
     struct sockaddr_in  *sin;
     //char *tmp_port;
 
-    r = PHP_NGX_G(global_r);
+    r = ngx_php_request;
     //tmp_port = emalloc(sizeof("65535") - 1);
     sin = (struct sockaddr_in *) r->connection->local_sockaddr;
     port = ntohs(sin->sin_port);
@@ -220,7 +220,7 @@ PHP_METHOD(ngx_request, server_port)
     struct sockaddr_in  *sin;
     //char *tmp_port;
 
-    r = PHP_NGX_G(global_r);
+    r = ngx_php_request;
     //tmp_port = emalloc(sizeof("65535") - 1);
     sin = (struct sockaddr_in *) r->connection->local_sockaddr;
     port = ntohs(sin->sin_port);
@@ -236,7 +236,7 @@ PHP_METHOD(ngx_request, server_name)
     ngx_http_request_t *r;
     ngx_http_core_srv_conf_t *cscf;
 
-    r = PHP_NGX_G(global_r);
+    r = ngx_php_request;
     cscf = ngx_http_get_module_srv_conf(r, ngx_http_core_module);
 
     ZVAL_STRINGL(return_value, (char *)cscf->server_name.data, cscf->server_name.len, 1);
@@ -249,7 +249,7 @@ PHP_METHOD(ngx_request, headers)
     ngx_table_elt_t *header;
     ngx_uint_t i;
 
-    r = PHP_NGX_G(global_r);
+    r = ngx_php_request;
     part = &r->headers_in.headers.part;
     header = part->elts;
 
@@ -342,7 +342,7 @@ static const zend_function_entry php_ngx_request_class_functions[] = {
     {NULL, NULL, NULL, 0, 0}
 };
 
-void ext_php_ngx_request_init(int module_number TSRMLS_DC)
+void php_impl_ngx_request_init(int module_number TSRMLS_DC)
 {
     zend_class_entry ngx_request_class_entry;
     INIT_CLASS_ENTRY(ngx_request_class_entry, "ngx_request", php_ngx_request_class_functions);
