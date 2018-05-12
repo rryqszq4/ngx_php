@@ -69,6 +69,7 @@ ngx_http_php_coroutine_yield(ngx_http_request_t *r)
     ctx->execute_data = zend_create_execute_data_from_op_array(ctx->op_array, 0 TSRMLS_CC);
     EG(current_execute_data) = current_execute_data;
     EG(opline_ptr) = opline_ptr;
+    *(EG(argument_stack)->top-1) = NULL;
     ctx->argument_stack = EG(argument_stack);
     EG(argument_stack) = current_stack;
     ctx->opline_ptr = *EG(opline_ptr);
