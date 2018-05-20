@@ -12,6 +12,7 @@
 #include <nginx.h>
 
 #include "php/php_ngx.h"
+#include "php/php_ngx_execute.h"
 #include "php/php_ngx_core.h"
 #include "php/php_ngx_log.h"
 #include "php/php_ngx_request.h"
@@ -481,8 +482,8 @@ ngx_http_php_init_worker(ngx_cycle_t *cycle)
 	old_zend_error_cb = zend_error_cb;
 	zend_error_cb = ngx_php_error_cb;
 
-	//ori_execute_ex = zend_execute_ex;
-    //zend_execute_ex = ngx_execute_ex;
+	ori_execute_ex = zend_execute_ex;
+    zend_execute_ex = ngx_coexecute_ex;
 
     //zend_execute_internal = ngx_execute_internal;
 

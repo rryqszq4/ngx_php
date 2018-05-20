@@ -10,23 +10,6 @@
 #include "../ngx_http_php_module.h"
 #include "../ngx_http_php_sleep.h"
 
-void ngx_execute_ex(zend_execute_data *execute_data TSRMLS_DC)
-{
-    ngx_php_debug("start");
-    ori_execute_ex(execute_data TSRMLS_CC);
-
-    ngx_php_debug("EG(argument_stack): %p", EG(argument_stack));
-    ngx_php_debug("end");
-}
-
-void 
-ngx_execute_internal(zend_execute_data *execute_data_ptr, zend_fcall_info *fci, int return_value_used TSRMLS_DC)
-{
-
-    execute_internal(execute_data_ptr, fci, return_value_used TSRMLS_CC);
-
-}
-
 static zend_class_entry *php_ngx_class_entry;
 static zend_class_entry *php_co_ngx_class_entry;
 
