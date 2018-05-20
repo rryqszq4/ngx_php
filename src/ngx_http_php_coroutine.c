@@ -56,9 +56,12 @@ ngx_http_php_coroutine_yield(ngx_http_request_t *r)
 
 	ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
 
-	zend_execute_data *current_execute_data = EG(current_execute_data);
-    zend_op **opline_ptr;
-    opline_ptr = EG(opline_ptr);
+
+
+	ngx_php_debug("not yield; opline: %p, %s, %p", EG(opline_ptr),zend_get_opcode_name((*EG(opline_ptr))->opcode), *EG(opline_ptr));
+	zend_execute_data *current_execute_data;
+	current_execute_data = EG(current_execute_data);
+	ctx->opline = current_execute_data->opline;
     zend_vm_stack current_stack = EG(argument_stack);
     //ctx->op_array = (zend_op_array*)emalloc(sizeof(zend_op_array));
     ctx->op_array = EG(active_op_array);
@@ -68,12 +71,9 @@ ngx_http_php_coroutine_yield(ngx_http_request_t *r)
     ctx->op_array->fn_flags |= ZEND_ACC_GENERATOR;
     ctx->execute_data = zend_create_execute_data_from_op_array(ctx->op_array, 0 TSRMLS_CC);
     EG(current_execute_data) = current_execute_data;
-    EG(opline_ptr) = opline_ptr;
     *(EG(argument_stack)->top-1) = NULL;
     ctx->argument_stack = EG(argument_stack);
     EG(argument_stack) = current_stack;
-    ctx->opline_ptr = *EG(opline_ptr);
-    EG(opline_ptr) = opline_ptr;
     ctx->op_array->fn_flags &= ~ZEND_ACC_GENERATOR;
 
 	if (ngx_php_coroutine_yield(ctx->coro) != 0) {
@@ -84,13 +84,18 @@ ngx_http_php_coroutine_yield(ngx_http_request_t *r)
 
     ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
 
-    //ctx->execute_data->opline++;
+    ctx->execute_data->opline = ctx->opline;
+    ctx->execute_data->opline++;
     EG(current_execute_data) = ctx->execute_data;
     EG(argument_stack) = ctx->argument_stack;
-    EG(opline_ptr) = &(ctx->opline_ptr);
+    EG(opline_ptr) = &(ctx->execute_data->opline);
     EG(return_value_ptr_ptr) = ctx->return_value_ptr_ptr;
-    //ctx->op_array->fn_flags &= ~ZEND_ACC_GENERATOR;
     EG(active_op_array) = ctx->op_array;
+
+    ngx_php_debug("yield; opline: %p, %s, %p, %p", EG(opline_ptr),zend_get_opcode_name((*EG(opline_ptr))->opcode), *EG(opline_ptr),
+    	&ctx->execute_data->op_array->opcodes[(int)ctx->execute_data->op_array->last - 1]);
+
+    
 
 	return NGX_OK;
 }
