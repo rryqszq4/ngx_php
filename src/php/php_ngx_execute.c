@@ -29,13 +29,13 @@ void ngx_coexecute_ex(zend_execute_data *execute_data TSRMLS_DC)
 
         }
         zend_op_array op_array;
-        zend_op op;
+        zend_op op = NULL;
         int i;
         op_array = *EG(current_execute_data)->op_array;
         for (i = 0; i < (int)op_array.last; i++) {
             op = op_array.opcodes[i];
             ngx_php_debug("|        [%d].opcode = %p(%s)\n", i, &op_array.opcodes[i], zend_get_opcode_name(op.opcode));
-                }
+        }
 
         if ((ret = EG(current_execute_data)->opline->handler(EG(current_execute_data) TSRMLS_CC)) > 0) {
             if (ret == 1) {
