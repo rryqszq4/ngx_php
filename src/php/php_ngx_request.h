@@ -1,5 +1,5 @@
 /**
- *    Copyright(c) 2016-2017 rryqszq4
+ *    Copyright(c) 2016-2018 rryqszq4
  *
  *
  */
@@ -28,6 +28,6 @@ PHP_METHOD(ngx_request, server_port);
 PHP_METHOD(ngx_request, server_name);
 PHP_METHOD(ngx_request, headers);
 
-void ext_php_ngx_request_init(int module_number TSRMLS_DC);
+void php_impl_ngx_request_init(int module_number TSRMLS_DC);
 
 #endif

@@ -9,11 +9,14 @@
 #include "ngx_http_php_zend_uthread.h"
 
 void 
-ngx_http_php_zend_uthread_rewrite_inline_routine(ngx_http_request_t *r)
+ngx_http_php_zend_uthread_rewrite_inline_routine(void *data)
 {
+    ngx_http_request_t *r;
     ngx_http_php_ctx_t *ctx;
     ngx_http_php_loc_conf_t *plcf;
     ngx_str_t inline_code;
+
+    r = data;
 
     plcf = ngx_http_get_module_loc_conf(r, ngx_http_php_module);
     ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
@@ -51,14 +54,19 @@ ngx_http_php_zend_uthread_rewrite_inline_routine(ngx_http_request_t *r)
         ngx_http_php_zend_uthread_create(r, "ngx_rewrite");
 
     }zend_end_try();
+
+    ctx->phase_status = NGX_OK;
 }
 
 void 
-ngx_http_php_zend_uthread_access_inline_routine(ngx_http_request_t *r)
+ngx_http_php_zend_uthread_access_inline_routine(void *data)
 {
+    ngx_http_request_t *r;
     ngx_http_php_ctx_t *ctx;
     ngx_http_php_loc_conf_t *plcf;
     ngx_str_t inline_code;
+
+    r = data;
 
     plcf = ngx_http_get_module_loc_conf(r, ngx_http_php_module);
     ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
@@ -96,14 +104,19 @@ ngx_http_php_zend_uthread_access_inline_routine(ngx_http_request_t *r)
         ngx_http_php_zend_uthread_create(r, "ngx_access");
 
     }zend_end_try();
+
+    ctx->phase_status = NGX_OK;
 }
 
 void 
-ngx_http_php_zend_uthread_content_inline_routine(ngx_http_request_t *r)
+ngx_http_php_zend_uthread_content_inline_routine(void *data)
 {
+    ngx_http_request_t *r;
     ngx_http_php_ctx_t *ctx;
     ngx_http_php_loc_conf_t *plcf;
     ngx_str_t inline_code;
+
+    r = data;
 
     plcf = ngx_http_get_module_loc_conf(r, ngx_http_php_module);
     ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
@@ -141,6 +154,9 @@ ngx_http_php_zend_uthread_content_inline_routine(ngx_http_request_t *r)
         ngx_http_php_zend_uthread_create(r, "ngx_content");
     
     }zend_end_try();
+
+    ctx->phase_status = NGX_OK;
+    //ngx_http_core_run_phases(r);
 }
 
 void 
@@ -168,18 +184,26 @@ ngx_http_php_zend_uthread_create(ngx_http_request_t *r, char *func_prefix)
 
     func_name.data = ngx_pnalloc(r->pool, strlen(func_prefix) + 32);
 
-    func_name.len = ngx_sprintf(func_name.data, "%s_%V", func_prefix, &(plcf->content_inline_code->code_id)) - func_name.data;
-
+    if (strcmp(func_prefix, "ngx_rewrite") == 0) {
+        func_name.len = ngx_sprintf(func_name.data, "%s_%V", func_prefix, &(plcf->rewrite_inline_code->code_id)) - func_name.data;
+    }else if (strcmp(func_prefix, "ngx_access") == 0) {
+        func_name.len = ngx_sprintf(func_name.data, "%s_%V", func_prefix, &(plcf->access_inline_code->code_id)) - func_name.data;
+    }else if (strcmp(func_prefix, "ngx_content") == 0) {
+        func_name.len = ngx_sprintf(func_name.data, "%s_%V", func_prefix, &(plcf->content_inline_code->code_id)) - func_name.data;
+    }else {
+        func_name.len = 0;
+    }
 
     ngx_php_debug("%*s", (int)func_name.len, func_name.data);
 
+    MAKE_STD_ZVAL(func_main);
     ZVAL_STRINGL(func_main, (char *)func_name.data, func_name.len, 1);
     call_user_function(EG(function_table), NULL, func_main, ctx->generator_closure, 0, NULL TSRMLS_CC);
     zval_ptr_dtor(&func_main);
 
     if (Z_TYPE_P(ctx->generator_closure) == IS_OBJECT){
     	MAKE_STD_ZVAL(func_valid);
-        ZVAL_STRING(&func_valid, "valid", 1);
+        ZVAL_STRING(func_valid, "valid", 1);
         if (call_user_function(NULL, &(ctx->generator_closure), func_valid, &retval, 0, NULL TSRMLS_CC) == FAILURE)
         {
             php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed calling valid");
@@ -222,7 +246,7 @@ ngx_http_php_zend_uthread_resume(ngx_http_request_t *r)
 
         closure = ctx->generator_closure;
 
-        MAKE_STD_ZVAL(func_valid);
+        MAKE_STD_ZVAL(func_next);
         ZVAL_STRING(func_next, "next", 1);
         call_user_function(NULL, &(closure), func_next, &retval, 0, NULL TSRMLS_CC);
         zval_ptr_dtor(&func_next);
@@ -246,6 +270,19 @@ ngx_http_php_zend_uthread_resume(ngx_http_request_t *r)
     }zend_catch {
 
     }zend_end_try();
+}
+
+void 
+ngx_http_php_zend_uthread_continue(ngx_http_request_t *r)
+{
+    //ngx_http_php_ctx_t *ctx;
+
+    ngx_php_request = r;
+    //ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
+    //ctx->phase_status = NGX_OK;
+    
+    ngx_http_core_run_phases(r);
+
 }
 
 void 

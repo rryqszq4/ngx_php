@@ -1,5 +1,5 @@
 /**
- *    Copyright(c) 2016-2017 rryqszq4
+ *    Copyright(c) 2016-2018 rryqszq4
  *
  *
  */
@@ -10,10 +10,7 @@
 #include <ngx_http.h>
 #include <php_embed.h>
 #include "php/php_ngx.h"
-
-#include "ngx_php_thread.h"
-#include "ngx_php_thread_pool.h"
-#include "ngx_php_uthread.h"
+#include "ngx_php_coroutine.h"
 
 extern ngx_http_request_t *ngx_php_request;
 
@@ -33,6 +30,7 @@ typedef struct ngx_http_php_code_s {
 		char *string;
 	} code;
 	code_type_t code_type;
+	ngx_str_t code_id;
 } ngx_http_php_code_t;
 
 #if defined(NDK) && NDK
@@ -61,6 +59,7 @@ typedef struct ngx_http_php_ctx_s {
 	size_t body_length;
 	ngx_str_t request_body_ctx;
 	unsigned request_body_more : 1;		//post request flag
+	unsigned read_request_body_done : 1;
 
 	unsigned enable_async : 1;
 	unsigned enable_subrequest : 1;
@@ -76,43 +75,10 @@ typedef struct ngx_http_php_ctx_s {
 	ngx_array_t *capture_multi;
 	ngx_uint_t capture_multi_complete_total;
 
-	unsigned enable_upstream : 1;
-	unsigned enable_upstream_continue : 1;
-
-	unsigned read_or_write : 1;
-
-	ngx_str_t host;
-	int port;
-	ngx_str_t send_buf;
-	ngx_http_status_t receive_status;
-	ngx_str_t receive_buf;
-	ngx_int_t receive_stat;
-	ngx_int_t receive_total;
-	ngx_list_t *receive_list;
-	ngx_msec_t timeout;
-
-	pthread_mutex_t mutex;
-	pthread_cond_t cond;
-	pthread_t pthread_id;
-
-	sem_t sem_thread;
-
 	ngx_int_t error;
 
-	ngx_http_request_t* request;
-
-	unsigned enable_sleep : 1;
 	ngx_int_t delay_time;
 	ngx_event_t sleep;
-
-	ngx_php_thread_task_t *thread_task;
-	ngx_php_thread_pool_t *thread_pool;
-	ngx_int_t thread_wait;
-
-	ngx_php_uthread_t *uthread;
-	ngx_php_uthread_t *rewrite_uthread;
-	ngx_php_uthread_t *access_uthread;
-	ngx_php_uthread_t *content_uthread;
 
 	unsigned rewrite_phase : 1;
 	unsigned access_phase : 1;
@@ -123,6 +89,15 @@ typedef struct ngx_http_php_ctx_s {
 	void **uthread_ctx;
 
 	zval *generator_closure;
+
+	ngx_php_coroutine_t *coro;
+	zend_execute_data *execute_data;
+	zend_op *opline;
+	zend_op_array *op_array;
+	HashTable *symbol_table;
+	zend_vm_stack argument_stack;
+	zend_vm_stack ori_stack;
+	zval **return_value_ptr_ptr;
 	
 } ngx_http_php_ctx_t;
 
