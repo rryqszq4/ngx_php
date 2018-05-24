@@ -294,13 +294,13 @@ ngx_http_php_rewrite_inline_handler(ngx_http_request_t *r)
 	if (ctx->phase_status == NGX_DECLINED){
 
 		//ngx_http_php_rewrite_inline_uthread_routine(r);
-		//ngx_http_php_zend_uthread_rewrite_inline_routine(r);
+		ngx_http_php_zend_uthread_rewrite_inline_routine(r);
 
-		ctx->coro = ngx_http_php_coroutine_alloc(r);
+		/*ctx->coro = ngx_http_php_coroutine_alloc(r);
 		ctx->coro->routine = ngx_http_php_zend_uthread_rewrite_inline_routine;
 		ctx->coro->data = r;
 		ngx_http_php_coroutine_run(r);
-		ngx_php_debug("coroutine create");
+		ngx_php_debug("coroutine create");*/
 
 		if (ctx->phase_status == NGX_AGAIN){
 			
@@ -631,13 +631,13 @@ ngx_http_php_access_inline_handler(ngx_http_request_t *r)
 	if (ctx->phase_status == NGX_DECLINED) {
 
 		//ngx_http_php_access_inline_uthread_routine(r);
-		//ngx_http_php_zend_uthread_access_inline_routine(r);
+		ngx_http_php_zend_uthread_access_inline_routine(r);
 
-		ctx->coro = ngx_http_php_coroutine_alloc(r);
+		/*ctx->coro = ngx_http_php_coroutine_alloc(r);
 		ctx->coro->routine = ngx_http_php_zend_uthread_access_inline_routine;
 		ctx->coro->data = r;
 		ngx_http_php_coroutine_run(r);
-		ngx_php_debug("coroutine create");
+		ngx_php_debug("coroutine create");*/
 
 		if (ctx->phase_status == NGX_AGAIN){
 			
@@ -1043,13 +1043,13 @@ ngx_http_php_content_inline_handler(ngx_http_request_t *r)
 	if (ctx->phase_status == NGX_DECLINED) {
 
 		//ngx_http_php_content_inline_uthread_routine(r);
-		//ngx_http_php_zend_uthread_content_inline_routine(r);
+		ngx_http_php_zend_uthread_content_inline_routine(r);
 
-		ctx->coro = ngx_http_php_coroutine_alloc(r);
+		/*ctx->coro = ngx_http_php_coroutine_alloc(r);
 		ctx->coro->routine = ngx_http_php_zend_uthread_content_inline_routine;
 		ctx->coro->data = r;
 		ngx_http_php_coroutine_run(r);
-		ngx_php_debug("coroutine create");
+		ngx_php_debug("coroutine create");*/
 
 		//ctx->phase_status = NGX_OK;
 

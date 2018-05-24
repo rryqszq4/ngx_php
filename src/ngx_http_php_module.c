@@ -482,8 +482,8 @@ ngx_http_php_init_worker(ngx_cycle_t *cycle)
 	old_zend_error_cb = zend_error_cb;
 	zend_error_cb = ngx_php_error_cb;
 
-	ori_execute_ex = zend_execute_ex;
-    zend_execute_ex = ngx_coexecute_ex;
+	//ori_execute_ex = zend_execute_ex;
+    //zend_execute_ex = ngx_coexecute_ex;
 
     //zend_execute_internal = ngx_execute_internal;
 
