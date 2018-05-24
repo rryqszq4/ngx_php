@@ -239,6 +239,8 @@ ngx_http_php_cosleep(ngx_http_request_t *r)
                 } */
     ngx_http_php_coroutine_yield(r);
 
+    ctx->phase_status = NGX_OK;
+
     /*r = ngx_php_request;
 
     ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);

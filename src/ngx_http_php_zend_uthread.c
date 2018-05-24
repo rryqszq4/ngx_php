@@ -275,11 +275,11 @@ ngx_http_php_zend_uthread_resume(ngx_http_request_t *r)
 void 
 ngx_http_php_zend_uthread_continue(ngx_http_request_t *r)
 {
-    ngx_http_php_ctx_t *ctx;
+    //ngx_http_php_ctx_t *ctx;
 
     ngx_php_request = r;
-    ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
-    ctx->phase_status = NGX_OK;
+    //ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
+    //ctx->phase_status = NGX_OK;
     
     ngx_http_core_run_phases(r);
 

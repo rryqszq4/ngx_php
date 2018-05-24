@@ -74,6 +74,14 @@ ngx_http_php_coroutine_yield(ngx_http_request_t *r)
     *(EG(argument_stack)->top-1) = NULL;
     ctx->argument_stack = EG(argument_stack);
     EG(argument_stack) = current_stack;
+
+    ctx->execute_data->current_scope = EG(scope);
+	ctx->execute_data->current_called_scope = EG(called_scope);
+	ctx->execute_data->symbol_table = EG(active_symbol_table);
+	ctx->execute_data->current_this = EG(This);
+
+	ctx->execute_data->call = current_execute_data->call;
+
     ctx->op_array->fn_flags &= ~ZEND_ACC_GENERATOR;
 
 	if (ngx_php_coroutine_yield(ctx->coro) != 0) {
@@ -92,10 +100,13 @@ ngx_http_php_coroutine_yield(ngx_http_request_t *r)
     EG(return_value_ptr_ptr) = ctx->return_value_ptr_ptr;
     EG(active_op_array) = ctx->op_array;
 
+    EG(active_symbol_table) = ctx->execute_data->symbol_table;
+	EG(This) = ctx->execute_data->current_this;
+	EG(scope) = ctx->execute_data->current_scope;
+	EG(called_scope) = ctx->execute_data->current_called_scope;
+
     ngx_php_debug("yield; opline: %p, %s, %p, %p", EG(opline_ptr),zend_get_opcode_name((*EG(opline_ptr))->opcode), *EG(opline_ptr),
     	&ctx->execute_data->op_array->opcodes[(int)ctx->execute_data->op_array->last - 1]);
-
-    
 
 	return NGX_OK;
 }

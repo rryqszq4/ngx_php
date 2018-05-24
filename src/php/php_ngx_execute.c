@@ -19,6 +19,15 @@ void ngx_coexecute_ex(zend_execute_data *execute_data TSRMLS_DC)
         int ret;
         ngx_php_debug(" loop: \nexecute_data: %p, \nexecute_data->opline: %p, \nEG(current_execute_data): %p, \nEG(current_execute_data)->opline: %p, \nEG(opline_ptr): %p", 
             execute_data, execute_data->opline, EG(current_execute_data),EG(current_execute_data)->opline, *EG(opline_ptr));
+        ngx_php_debug("%p, %p", execute_data->call, EG(current_execute_data)->call);
+        if (execute_data->call || EG(current_execute_data)->call){
+        ngx_php_debug("%p, %d, %p, %d\n", 
+        	execute_data->call->called_scope, execute_data->call->num_additional_args, 
+        	EG(current_execute_data)->call->called_scope, EG(current_execute_data)->call->num_additional_args);
+        	
+        	//EG(current_execute_data)->call->num_additional_args = 0;
+
+        }
         zend_op_array op_array;
         zend_op op;
         int i;
