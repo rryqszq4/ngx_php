@@ -1,6 +1,5 @@
-<div align="left">
-<a href="https://github.com/rryqszq4/ngx_php"><img width="320" src="https://raw.githubusercontent.com/rryqszq4/ngx_php/master/doc/ngx_php_logo.png"></a>
-</div>
+ngx_php
+=======
 
 [![Build Status](https://travis-ci.org/rryqszq4/ngx_php.svg?branch=master)](https://travis-ci.org/rryqszq4/ngx_php) 
 [![Gitter](https://badges.gitter.im/rryqszq4/ngx_php.svg)](https://gitter.im/rryqszq4/ngx_php?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
@@ -266,9 +265,6 @@ set_run_by_php_file
 Nginx API for php
 -----------------
 * [ngx::_exit](#ngx_exit)
-* [ngx::sleep](#ngxsleep)
-* [ngx_generator::run]
-* [ngx_php::main]
 * [ngx_log::error](#ngx_logerror)
 
 ngx::_exit
@@ -281,11 +277,6 @@ echo "start\n";
 ngx::_exit(200);
 echo "end\n";
 ```
-
-ngx::sleep
-----------
-* **syntax:** `ngx::sleep(int $time)`
-* **context:** `content_by_php`
 
 ngx_log::error
 --------------
