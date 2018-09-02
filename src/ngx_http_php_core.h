@@ -1,5 +1,5 @@
 /**
- *    Copyright(c) 2016-2018 rryqszq4
+ *    Copyright(c) 2016-2017 rryqszq4
  *
  *
  */
@@ -9,129 +9,129 @@
 
 #include <ngx_http.h>
 #include <php_embed.h>
-#include "php/php_ngx.h"
-#include "ngx_php_coroutine.h"
+#include "php/impl/php_ngx.h"
+
+#include "ngx_http_php_socket.h"
+
+#define OUTPUT_CONTENT  1<<0
+#define OUTPUT_OPCODE   1<<1
+#define OUTPUT_STACK    1<<2
 
 extern ngx_http_request_t *ngx_php_request;
 
-typedef struct ngx_http_php_state_s {
-	unsigned php_init;
-	unsigned php_shutdown;
+typedef struct ngx_http_php_state_t {
+    unsigned php_init;
+    unsigned php_shutdown;
 } ngx_http_php_state_t;
 
-typedef enum code_type_s {
-	NGX_HTTP_PHP_CODE_TYPE_FILE,
-	NGX_HTTP_PHP_CODE_TYPE_STRING
+typedef enum code_type_t {
+    NGX_HTTP_PHP_CODE_TYPE_FILE,
+    NGX_HTTP_PHP_CODE_TYPE_STRING
 } code_type_t;
 
-typedef struct ngx_http_php_code_s {
-	union code {
-		char *file;
-		char *string;
-	} code;
-	code_type_t code_type;
-	ngx_str_t code_id;
+typedef struct ngx_http_php_code_t {
+    union code {
+        char *file;
+        char *string;
+    } code;
+    code_type_t code_type;
+    ngx_str_t code_id;
 } ngx_http_php_code_t;
 
 #if defined(NDK) && NDK
-typedef struct ngx_http_php_set_var_data_s {
-	size_t size;
-	ngx_str_t var_name;
-	ngx_str_t script;
-	ngx_http_php_code_t *code;
-	ngx_str_t result;
+typedef struct {
+    size_t size;
+    ngx_str_t var_name;
+    ngx_str_t script;
+    ngx_http_php_code_t *code;
+    ngx_str_t result;
 } ngx_http_php_set_var_data_t;
 #endif
 
-typedef struct ngx_http_php_rputs_chain_list_s {
-	ngx_chain_t **last;
-	ngx_chain_t *out;
+typedef struct ngx_http_php_rputs_chain_list_t {
+    ngx_chain_t **last;
+    ngx_chain_t *out;
 } ngx_http_php_rputs_chain_list_t;
 
-typedef struct ngx_http_php_capture_node_s {
-	ngx_str_t capture_uri;
-	ngx_buf_t *capture_buf;
-	ngx_str_t capture_str;
+typedef struct ngx_http_php_capture_node_t {
+    ngx_str_t capture_uri;
+    ngx_buf_t *capture_buf;
+    ngx_str_t capture_str;
 } ngx_http_php_capture_node_t;
 
-typedef struct ngx_http_php_ctx_s {
-	ngx_http_php_rputs_chain_list_t *rputs_chain;
-	size_t body_length;
-	ngx_str_t request_body_ctx;
-	unsigned request_body_more : 1;		//post request flag
-	unsigned read_request_body_done : 1;
+typedef struct ngx_http_php_ctx_t {
+    ngx_http_php_rputs_chain_list_t *rputs_chain;
+    size_t body_length;
+    ngx_str_t request_body_ctx;
+    unsigned request_body_more : 1;
+    unsigned read_request_body_done : 1;
 
-	unsigned enable_async : 1;
-	unsigned enable_subrequest : 1;
-	unsigned enable_thread : 1;
-	unsigned is_capture_multi : 1;
-	unsigned is_capture_multi_complete : 1;
+    unsigned enable_async : 1;
+    unsigned enable_thread : 1;
+    unsigned is_capture_multi : 1;
+    unsigned is_capture_multi_complete : 1;
 
-	ngx_str_t capture_uri;
-	ngx_buf_t *capture_buf;
-	ngx_str_t capture_str;
-	zval *closure;
+    ngx_str_t capture_uri;
+    ngx_buf_t *capture_buf;
+    ngx_str_t capture_str;
+    zval *closure;
 
-	ngx_array_t *capture_multi;
-	ngx_uint_t capture_multi_complete_total;
+    ngx_array_t *capture_multi;
+    ngx_uint_t capture_multi_complete_total;
 
-	ngx_int_t error;
+    pthread_mutex_t mutex;
+    pthread_cond_t cond;
+    pthread_t pthread_id;
 
-	ngx_int_t delay_time;
-	ngx_event_t sleep;
+    ngx_int_t error;
 
-	unsigned rewrite_phase : 1;
-	unsigned access_phase : 1;
-	unsigned content_phase : 1;
+    unsigned output_type;
+    unsigned opcode_logo;
+    unsigned stack_logo;
+    ngx_uint_t stack_depth;
+    
+    unsigned rewrite_phase : 1;
+    unsigned access_phase : 1;
+    unsigned content_phase : 1;
 
-	ngx_int_t phase_status;
+    ngx_int_t phase_status;
 
-	void **uthread_ctx;
+    zval *generator_closure;
 
-	zval *generator_closure;
+    ngx_int_t delay_time;
+    ngx_event_t sleep;
 
-	ngx_php_coroutine_t *coro;
-	zend_execute_data *execute_data;
-	zend_op *opline;
-	zend_op_array *op_array;
-	HashTable *symbol_table;
-	zend_vm_stack argument_stack;
-	zend_vm_stack ori_stack;
-	zval **return_value_ptr_ptr;
-	
+    ngx_http_php_socket_upstream_t  *upstream;
+    ngx_str_t   host;
+    in_port_t   port;
+
 } ngx_http_php_ctx_t;
 
 
 ngx_http_php_code_t *ngx_http_php_code_from_file(ngx_pool_t *pool, ngx_str_t *code_file_path);
 ngx_http_php_code_t *ngx_http_php_code_from_string(ngx_pool_t *pool, ngx_str_t *code_str);
 
-#define NGX_HTTP_PHP_NGX_INIT ngx_http_php_request_init(r TSRMLS_CC); 	\
-		php_ngx_request_init(TSRMLS_C);									\
-		zend_first_try {
+#define NGX_HTTP_PHP_NGX_INIT ngx_http_php_request_init(r TSRMLS_CC);   \
+        php_ngx_request_init(TSRMLS_C);                                 \
+        zend_first_try {
 
-#define NGX_HTTP_PHP_NGX_SHUTDOWN } zend_catch {		\
-		} zend_end_try();								\
-		ngx_http_php_request_clean(TSRMLS_C);			\
-		php_ngx_request_shutdown(TSRMLS_C);
-
-#define NGX_HTTP_PHP_R_INIT(r) ngx_http_php_request_init(r TSRMLS_CC); 	\
-		php_ngx_request_init(TSRMLS_C);									\
-		PHP_NGX_G(global_r) = r;
-
-#define NGX_HTTP_PHP_R_SHUTDOWN(r) ngx_http_php_request_clean(TSRMLS_C);	\
-		php_ngx_request_shutdown(TSRMLS_C);
+#define NGX_HTTP_PHP_NGX_SHUTDOWN } zend_catch {        \
+        } zend_end_try();                               \
+        ngx_http_php_request_clean(TSRMLS_C);           \
+        php_ngx_request_shutdown(TSRMLS_C);
 
 // php_ngx run
-ngx_int_t ngx_php_embed_run(ngx_http_request_t *r, ngx_http_php_code_t *code);
+//ngx_int_t ngx_php_embed_run(ngx_http_request_t *r, ngx_http_php_code_t *code);
 ngx_int_t ngx_php_ngx_run(ngx_http_request_t *r, ngx_http_php_state_t *state, ngx_http_php_code_t *code);
-ngx_int_t ngx_php_eval_code(ngx_http_request_t *r, ngx_http_php_state_t *state, ngx_http_php_code_t *code TSRMLS_DC);
-ngx_int_t ngx_php_eval_file(ngx_http_request_t *r, ngx_http_php_state_t *state, ngx_http_php_code_t *code TSRMLS_DC);
 
-ngx_int_t ngx_php_get_request_status(TSRMLS_D);
-ngx_int_t ngx_php_set_request_status(ngx_int_t rc TSRMLS_DC);
+ngx_int_t ngx_php_eval_code(ngx_http_request_t *r, ngx_http_php_state_t *state, ngx_http_php_code_t *code);
+ngx_int_t ngx_php_eval_file(ngx_http_request_t *r, ngx_http_php_state_t *state, ngx_http_php_code_t *code);
+
+ngx_int_t ngx_php_get_request_status();
+ngx_int_t ngx_php_set_request_status(ngx_int_t rc);
 
 // php_ngx sapi call_back
-int ngx_http_php_code_ub_write(const char *str, unsigned int str_length TSRMLS_DC);
+size_t ngx_http_php_code_ub_write(const char *str, size_t str_length TSRMLS_DC);
 void ngx_http_php_code_flush(void *server_context);
 void ngx_http_php_code_log_message(char *message);
 void ngx_http_php_code_register_server_variables(zval *track_vars_array TSRMLS_DC);

@@ -16,17 +16,15 @@
 #include <php_ini.h>
 #include <ext/standard/info.h>
 
-void ngx_http_php_zend_uthread_rewrite_inline_routine(void *data);
-void ngx_http_php_zend_uthread_access_inline_routine(void *data);
-void ngx_http_php_zend_uthread_content_inline_routine(void *data);
+void ngx_http_php_zend_uthread_rewrite_inline_routine(ngx_http_request_t *r);
+void ngx_http_php_zend_uthread_access_inline_routine(ngx_http_request_t *r);
+void ngx_http_php_zend_uthread_content_inline_routine(ngx_http_request_t *r);
 
 void ngx_http_php_zend_uthread_file_routine(ngx_http_request_t *r);
 
 void ngx_http_php_zend_uthread_create(ngx_http_request_t *r, char *func_prefix);
 
 void ngx_http_php_zend_uthread_resume(ngx_http_request_t *r);
-
-void ngx_http_php_zend_uthread_continue(ngx_http_request_t *r);
 
 void ngx_http_php_zend_uthread_exit(ngx_http_request_t *r);
 
