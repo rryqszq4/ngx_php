@@ -67,7 +67,7 @@ http {
     
         location /php {
             content_by_php '
-                echo "hello ngx_php7";
+                echo "hello ngx_php";
             ';
         }
 
