@@ -73,14 +73,14 @@ ls ${PHP_SRC_ROOT}
 echo "nginx install ..."
 ./configure --prefix=${NGINX_SRC_ROOT} \
 --with-ld-opt="-Wl,-rpath,$PHP_LIB" \
---add-module=../../../ngx_php7/third_party/ngx_devel_kit \
---add-module=../../../ngx_php7
+--add-module=../../../ngx_php/third_party/ngx_devel_kit \
+--add-module=../../../ngx_php
 make
 make install
 if [ $? -eq 0 ];then
     echo "nginx install ... done"
-    echo "ngx_php7 compile success."
+    echo "ngx_php compile success."
 else 
-    echo "ngx_php7 compile failed."
+    echo "ngx_php compile failed."
     exit 1
 fi

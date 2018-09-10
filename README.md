@@ -1,13 +1,10 @@
-<div align="left">
-<a href="https://github.com/rryqszq4/ngx_php7"><img width="320" src="https://raw.githubusercontent.com/rryqszq4/ngx_php7/master/docs/ngx_php7_logo_v0.2.png"></a>
-</div>
+ngx_php
+=======
+[![Build Status](https://travis-ci.org/rryqszq4/ngx_php.svg?branch=master)](https://travis-ci.org/rryqszq4/ngx_php)
+[![license](https://img.shields.io/badge/license-BSD--2--Clause-blue.svg)](https://github.com/rryqszq4/ngx_php/blob/master/LICENSE)
+[![QQ group](https://img.shields.io/badge/QQ--group-558795330-26bcf5.svg)](https://github.com/rryqszq4/ngx_php)
 
-[![Build Status](https://travis-ci.org/rryqszq4/ngx_php7.svg?branch=master)](https://travis-ci.org/rryqszq4/ngx_php7)
-[![license](https://img.shields.io/badge/license-BSD--2--Clause-blue.svg)](https://github.com/rryqszq4/ngx_php7/blob/master/LICENSE)
-[![QQ group](https://img.shields.io/badge/QQ--group-558795330-26bcf5.svg)](https://github.com/rryqszq4/ngx_php7)
-
-[ngx_php7](https://github.com/rryqszq4/ngx_php7) - Embedded php7 programming language for nginx-module.  
-[ngx_php](https://github.com/rryqszq4/ngx_php) - Embedded php5 script language for nginx-module.  
+[ngx_php](https://github.com/rryqszq4/ngx_php) - Embedded php script language for nginx-module.  
 
 Requirement
 -----------
@@ -24,7 +21,7 @@ $ cd php-7.1.16
 $ ./configure --prefix=/path/to/php --enable-embed
 $ make && make install
 
-$ git clone https://github.com/rryqszq4/ngx_php7.git
+$ git clone https://github.com/rryqszq4/ngx_php.git
 
 $ wget 'http://nginx.org/download/nginx-1.10.3.tar.gz'
 $ tar -zxvf nginx-1.10.3.tar.gz
@@ -37,8 +34,8 @@ $ export PHP_LIB=/path/to/php/lib
 $ ./configure --user=www --group=www \
 $             --prefix=/path/to/nginx \
 $             --with-ld-opt="-Wl,-rpath,$PHP_LIB" \
-$             --add-module=/path/to/ngx_php7/third_party/ngx_devel_kit \
-$             --add-module=/path/to/ngx_php7
+$             --add-module=/path/to/ngx_php/third_party/ngx_devel_kit \
+$             --add-module=/path/to/ngx_php
 ```
 
 Synopsis
