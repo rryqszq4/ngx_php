@@ -1,9 +1,12 @@
 ngx_php
-=======
-[![Build Status](https://travis-ci.org/rryqszq4/ngx_php.svg?branch=master)](https://travis-ci.org/rryqszq4/ngx_php)
+========
+[![Build Status](https://travis-ci.org/rryqszq4/ngx_php.svg?branch=ngx_php7)](https://travis-ci.org/rryqszq4/ngx_php)
 [![license](https://img.shields.io/badge/license-BSD--2--Clause-blue.svg)](https://github.com/rryqszq4/ngx_php/blob/master/LICENSE)
 [![QQ group](https://img.shields.io/badge/QQ--group-558795330-26bcf5.svg)](https://github.com/rryqszq4/ngx_php)
 
+![](https://raw.githubusercontent.com/rryqszq4/ngx_php/ngx_php7/docs/hello_world_performance.png)
+
+[ngx_php7](https://github.com/rryqszq4/ngx_php7) - Embedded php7 programming language for nginx-module.  
 [ngx_php](https://github.com/rryqszq4/ngx_php) - Embedded php script language for nginx-module.  
 
 Requirement
@@ -77,6 +80,7 @@ http {
             ';
         }
 
+        # curl /ngx_get?a=1&b=2
         location = /ngx_get {
             content_by_php '
                 echo "ngx::query_args()\n";
@@ -84,6 +88,7 @@ http {
             ';
         }
 
+        # curl -d 'a=1&b=2' /ngx_post
         location = /ngx_post {
             content_by_php '
                 echo "ngx::post_args()\n";
@@ -103,7 +108,8 @@ http {
             default_type 'application/json;charset=UTF-8';
             content_by_php '
                 yield ngx_socket::connect("hq.sinajs.cn", 80);
-                yield ngx_socket::send("GET /list=s_sh000001 HTTP/1.0\r\nHost: hq.sinajs.cn\r\nConnection: close\r\n\r\n");
+                yield ngx_socket::send("GET /list=s_sh000001 HTTP/1.0\r\n
+                                        Host: hq.sinajs.cn\r\nConnection: close\r\n\r\n");
                 yield $ret = ngx_socket::recv(1024);
                 yield ngx_socket::close();
                 
@@ -111,9 +117,103 @@ http {
             ';
         }
 
+        location = /ngx_var {
+            set $a 1234567890;
+            content_by_php '
+                $a = ngx_var::get("a");
+                var_dump($a);
+            ';
+        }
+
     }
 }
 ```
+
+Test
+----
+Using the perl of [Test::Nginx](https://github.com/openresty/test-nginx) module to testing, searching and finding out problem in ngx_php7.
+```sh
+ngx_php7 test ...
+nginx version: nginx/1.10.3
+built by gcc 4.8.4 (Ubuntu 4.8.4-2ubuntu1~14.04.3) 
+configure arguments: --prefix=/home/travis/build/rryqszq4/ngx_php7/build/nginx --with-ld-opt=-Wl,-rpath,/home/travis/build/rryqszq4/ngx_php7/build/php/lib --add-module=../../../ngx_php7/third_party/ngx_devel_kit --add-module=../../../ngx_php7
+t/001-hello.t ........... ok
+t/002-ini.t ............. ok
+t/004-ngx_request.t ..... ok
+t/005-ngx_log.t ......... ok
+t/006-ngx_sleep.t ....... ok
+t/007-ngx_socket.t ...... ok
+t/008-ngx_exit.t ........ ok
+t/009-ngx_query_args.t .. ok
+t/010-ngx_post_args.t ... ok
+t/011-ngx_constants.t ... ok
+t/012-function.t ........ ok
+t/013-class.t ........... ok
+t/014-ngx_var.t ......... ok
+All tests successful.
+Files=13, Tests=28,  5 wallclock secs ( 0.05 usr  0.02 sys +  1.26 cusr  0.22 csys =  1.55 CPU)
+Result: PASS
+```
+
+Directives
+----------
+* [php_ini_path](#php_ini_path)
+* [init_worker_by_php](#init_worker_by_php)
+* [rewrite_by_php](#rewrite_by_php)
+* [access_by_php](#access_by_php)
+* [content_by_php](#content_by_php)
+* [log_by_php](#log_by_php)
+* [header_filter_by_php](#header_filter_by_php)
+* [body_filter_by_php](#body_filter_by_php)
+
+php_ini_path
+------------
+* **syntax:** `php_ini_path`_`<php.ini file path>`_
+* **context:** `http`
+* **phase:** `loading-config`
+
+init_worker_by_php
+------------------
+* **syntax:** `init_worker_by_php`_`<php script code>`_
+* **context:** `http`
+* **phase:** `starting-worker`
+
+rewrite_by_php
+--------------
+* **syntax:** `rewrite_by_php`_`<php script code>`_
+* **context:** `http, server, location, location if`
+* **phase:** `rewrite`
+
+access_by_php
+-------------
+* **syntax:** `access_by_php`_`<php script code>`_
+* **context:** `http, server, location, location if`
+* **phase:** `access`
+
+content_by_php
+--------------
+* **syntax:** `content_by_php`_`<php script code>`_
+* **context:** `http, server, location, location if`
+* **phase:** `content`
+
+log_by_php
+----------
+* **syntax:** `log_by_php`_`<php script code>`_
+* **context:** `http, server, location, location if`
+* **phase:** `log`
+
+header_filter_by_php
+--------------------
+* **syntax:** `header_filter_by_php`_`<php script code>`_
+* **context:** `http, server, location, location if`
+* **phase:** `output-header-filter`
+
+body_filter_by_php
+------------------
+* **syntax:** `body_filter_by_php`_`<php script code>`_
+* **context:** `http, server, location, location if`
+* **phase:** `output-body-filter`
+
 
 Copyright and License
 ---------------------
