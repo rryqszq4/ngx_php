@@ -1,5 +1,5 @@
 /**
- *    Copyright(c) 2016-2017 rryqszq4
+ *    Copyright(c) 2016-2018 rryqszq4
  *
  *
  */
@@ -44,5 +44,19 @@ void *ngx_http_php_async_inline_thread(void *arg);
 
 ngx_int_t ngx_http_php_content_sync_inline_handler(ngx_http_request_t *r);
 void *ngx_http_php_sync_inline_thread(void *arg);*/
+
+ngx_int_t ngx_http_php_log_handler(ngx_http_request_t *r);
+ngx_int_t ngx_http_php_log_file_handler(ngx_http_request_t *r);
+ngx_int_t ngx_http_php_log_inline_handler(ngx_http_request_t *r);
+
+// filter functions
+void ngx_http_php_header_filter_init(void);
+void ngx_http_php_body_filter_init(void);
+
+ngx_int_t ngx_http_php_header_filter(ngx_http_request_t *r);
+ngx_int_t ngx_http_php_header_filter_inline_handler(ngx_http_request_t *r);
+
+ngx_int_t ngx_http_php_body_filter(ngx_http_request_t *r, ngx_chain_t *in);
+ngx_int_t ngx_http_php_body_filter_inline_handler(ngx_http_request_t *r, ngx_chain_t *in);
 
 #endif

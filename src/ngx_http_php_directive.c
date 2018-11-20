@@ -1,5 +1,5 @@
 /**
- *    Copyright(c) 2016-2017 rryqszq4
+ *    Copyright(c) 2016-2018 rryqszq4
  *
  *
  */
@@ -69,6 +69,30 @@ ngx_http_php_init_file_phase(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
         return NGX_CONF_ERROR;
     }
     pmcf->init_code = code;
+
+    return NGX_CONF_OK;
+}
+
+char *
+ngx_http_php_init_worker_inline_phase(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+{
+    ngx_http_php_main_conf_t *pmcf;
+    ngx_str_t *value;
+    ngx_http_php_code_t *code;
+
+    pmcf = ngx_http_conf_get_module_main_conf(cf, ngx_http_php_module);
+    if (pmcf->init_inline_code != NGX_CONF_UNSET_PTR){
+        return "is duplicated";
+    }
+
+    value = cf->args->elts;
+
+    code = ngx_http_php_code_from_string(cf->pool, &value[1]);
+    if (code == NGX_CONF_UNSET_PTR){
+        return NGX_CONF_ERROR;
+    }
+    pmcf->init_worker_inline_code = code;
+    pmcf->enabled_init_worker_handler = 1;
 
     return NGX_CONF_OK;
 }
@@ -370,6 +394,71 @@ ngx_http_php_content_async_inline_phase(ngx_conf_t *cf, ngx_command_t *cmd, void
     return NGX_CONF_OK;
 }
 
+char *
+ngx_http_php_log_phase(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+{
+    ngx_http_php_main_conf_t *pmcf;
+    ngx_http_php_loc_conf_t *plcf;
+    ngx_str_t *value;
+    ngx_http_php_code_t *code;
+
+    if (cmd->post == NULL) {
+        return NGX_CONF_ERROR;
+    }
+
+    pmcf = ngx_http_conf_get_module_main_conf(cf, ngx_http_php_module);
+    plcf = conf;
+
+    if (plcf->log_handler != NULL){
+        return "is duplicated";
+    }
+
+    value = cf->args->elts;
+
+    code = ngx_http_php_code_from_file(cf->pool, &value[1]);
+    if (code == NGX_CONF_UNSET_PTR){
+        return NGX_CONF_ERROR;
+    }
+
+    plcf->log_code = code;
+    plcf->log_handler = cmd->post;
+    pmcf->enabled_log_handler = 1;
+
+    return NGX_CONF_OK;
+}
+
+char *
+ngx_http_php_log_inline_phase(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+{
+    ngx_http_php_main_conf_t *pmcf;
+    ngx_http_php_loc_conf_t *plcf;
+    ngx_str_t *value;
+    ngx_http_php_code_t *code;
+
+    if (cmd->post == NULL) {
+        return NGX_CONF_ERROR;
+    }
+
+    pmcf = ngx_http_conf_get_module_main_conf(cf, ngx_http_php_module);
+    plcf = conf;
+
+    if (plcf->log_handler != NULL){
+        return "is duplicated";
+    }
+
+    value = cf->args->elts;
+
+    code = ngx_http_php_code_from_string(cf->pool, &value[1]);
+    if (code == NGX_CONF_UNSET_PTR){
+        return NGX_CONF_ERROR;
+    }
+
+    plcf->log_inline_code = code;
+    plcf->log_handler = cmd->post;
+    pmcf->enabled_log_handler = 1;
+
+    return NGX_CONF_OK;
+}
 
 #if defined(NDK) && NDK
 
@@ -612,4 +701,70 @@ ngx_http_php_set_run_file(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 }
 
 #endif
+
+char *
+ngx_http_php_header_filter_inline_phase(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+{
+    ngx_http_php_main_conf_t *pmcf;
+    ngx_http_php_loc_conf_t *plcf;
+    ngx_str_t *value;
+    ngx_http_php_code_t *code;
+
+    if (cmd->post == NULL) {
+        return NGX_CONF_ERROR;
+    }
+
+    pmcf = ngx_http_conf_get_module_main_conf(cf, ngx_http_php_module);
+    plcf = conf;
+
+    if (plcf->header_filter_handler != NULL) {
+        return "is duplicated";
+    }
+
+    value = cf->args->elts;
+
+    code = ngx_http_php_code_from_string(cf->pool, &value[1]);
+    if (code == NGX_CONF_UNSET_PTR) {
+        return NGX_CONF_ERROR;
+    }
+
+    plcf->header_filter_inline_code = code;
+    plcf->header_filter_handler = cmd->post;
+    pmcf->enabled_header_filter = 1;
+
+    return NGX_CONF_OK;
+}
+
+char *
+ngx_http_php_body_filter_inline_phase(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
+{
+    ngx_http_php_main_conf_t *pmcf;
+    ngx_http_php_loc_conf_t *plcf;
+    ngx_str_t *value;
+    ngx_http_php_code_t *code;
+
+    if (cmd->post == NULL) {
+        return NGX_CONF_ERROR;
+    }
+
+    pmcf = ngx_http_conf_get_module_main_conf(cf, ngx_http_php_module);
+    plcf = conf;
+
+    if (plcf->body_filter_handler != NULL) {
+        return "is duplicated";
+    }
+
+    value = cf->args->elts;
+
+    code = ngx_http_php_code_from_string(cf->pool, &value[1]);
+    if (code == NGX_CONF_UNSET_PTR) {
+        return NGX_CONF_ERROR;
+    }
+
+    plcf->body_filter_inline_code = code;
+    plcf->body_filter_handler = cmd->post;
+    pmcf->enabled_body_filter = 1;
+
+    return NGX_CONF_OK;
+}
 
