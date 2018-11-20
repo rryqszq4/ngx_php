@@ -1,5 +1,5 @@
 /**
- *    Copyright(c) 2016-2018 rryqszq4
+ *    Copyright(c) 2016-2017 rryqszq4
  *
  *
  */
@@ -19,46 +19,7 @@
 
     #if (NGX_HAVE_VARIADIC_MACROS)
 
-        #define ddebug(...) fprintf(stderr, "[ngx_php] [debug] %s: ", __func__); \
-            fprintf(stderr, __VA_ARGS__); \
-            fprintf(stderr, " at %s line %d.\n", __FILE__, __LINE__);
-
-    #else
-
-        #include <stdarg.h>
-        #include <stdio.h>
-        #include <stdarg.h>
-
-        static void ddebug(const char *fmt, ...)
-        {
-        }
-
-    #endif
-
-#else
-    
-    #if (NGX_HAVE_VARIADIC_MACROS)
-
-        #define ddebug(...)
-
-    #else
-
-        #include <stdarg.h>
-
-        static void ddebug(const char *fmt, ...)
-        {
-        }
-
-    #endif
-
-#endif
-
-#if defined(NGX_PHP_DEBUG) && (NGX_PHP_DEBUG)
-
-    #if (NGX_HAVE_VARIADIC_MACROS)
-
-        #define ngx_php_debug(...) fprintf(stderr, "[ngx_php] [debug] *%d %s: ", \
-            (int) ngx_php_request->connection->log->connection, __func__); \
+        #define ngx_php_debug(...) fprintf(stderr, "[ngx_php] [debug] %s: ", __func__); \
             fprintf(stderr, __VA_ARGS__); \
             fprintf(stderr, " at %s line %d.\n", __FILE__, __LINE__);
 

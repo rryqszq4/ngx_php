@@ -23,20 +23,15 @@ compiler:
 cache:
   - apt
 env:
-  #- PHP_SRC_VERSION=5.3.29
-  #  NGINX_SRC_VERSION=1.7.12
-  #- PHP_SRC_VERSION=5.4.45
-  #  NGINX_SRC_VERSION=1.7.12
-  #- PHP_SRC_VERSION=5.5.38
-  #  NGINX_SRC_VERSION=1.7.12
-  - PHP_SRC_VERSION=5.6.36
+  - PHP_SRC_VERSION=7.0.26
     NGINX_SRC_VERSION=1.10.3
-  - PHP_SRC_VERSION=5.6.36
-    NGINX_SRC_VERSION=1.8.1
+  - PHP_SRC_VERSION=7.1.12
+    NGINX_SRC_VERSION=1.10.3
+  - PHP_SRC_VERSION=7.2.0
+    NGINX_SRC_VERSION=1.10.3
 install:
   - sudo cpanm -n Test::Nginx
 before_script:
-  - ./travis/compile.sh
-
+  - ./travis/compiler.sh
 script:
   - ./travis/test.sh

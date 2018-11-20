@@ -1,46 +1,44 @@
 ngx_addon_name=ngx_http_php_module
 HTTP_MODULES="$HTTP_MODULES ngx_http_php_module"
 NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/src/ngx_http_php_module.c \
-				$ngx_addon_dir/src/ngx_http_php_core.c \
-				$ngx_addon_dir/src/ngx_http_php_directive.c \
-				$ngx_addon_dir/src/ngx_http_php_handler.c \
-				$ngx_addon_dir/src/ngx_http_php_request.c \
-				$ngx_addon_dir/src/ngx_http_php_sleep.c \
-				$ngx_addon_dir/src/ngx_http_php_zend_uthread.c \
-				$ngx_addon_dir/src/ngx_http_php_coroutine.c \
-				$ngx_addon_dir/src/ngx_php_debug.c \
-				$ngx_addon_dir/src/php/php_ngx.c \
-				$ngx_addon_dir/src/php/php_ngx_log.c \
-				$ngx_addon_dir/src/php/php_ngx_core.c \
-				$ngx_addon_dir/src/php/php_ngx_request.c \
-				$ngx_addon_dir/src/php/php_ngx_execute.c \
-				$ngx_addon_dir/src/ngx_php_coroutine.c \
-				"
+                $ngx_addon_dir/src/ngx_http_php_core.c \
+                $ngx_addon_dir/src/ngx_http_php_directive.c \
+                $ngx_addon_dir/src/ngx_http_php_handler.c \
+                $ngx_addon_dir/src/ngx_http_php_request.c \
+                $ngx_addon_dir/src/ngx_http_php_zend_uthread.c \
+                $ngx_addon_dir/src/ngx_http_php_sleep.c \
+                $ngx_addon_dir/src/ngx_php_debug.c \
+                $ngx_addon_dir/src/php/impl/php_ngx.c \
+                $ngx_addon_dir/src/php/impl/php_ngx_test.c \
+                $ngx_addon_dir/src/php/impl/php_ngx_track.c \
+                $ngx_addon_dir/src/php/impl/php_ngx_core.c \
+                $ngx_addon_dir/src/php/impl/php_ngx_log.c \
+                $ngx_addon_dir/src/php/impl/php_ngx_request.c \
+                $ngx_addon_dir/src/php/impl/php_ngx_generator.c \
+                "
 NGX_ADDON_DEPS="$NGX_ADDON_DEPS $ngx_addon_dir/src/ngx_http_php_module.h \
-				$ngx_addon_dir/src/ngx_http_php_core.h \
-				$ngx_addon_dir/src/ngx_http_php_directive.h \
-				$ngx_addon_dir/src/ngx_http_php_handler.h \
-				$ngx_addon_dir/src/ngx_http_php_request.h \
-				$ngx_addon_dir/src/ngx_http_php_sleep.h \
-				$ngx_addon_dir/src/ngx_http_php_zend_uthread.h \
-				$ngx_addon_dir/src/ngx_http_php_coroutine.h \
-				$ngx_addon_dir/src/ngx_php_debug.h \
-				$ngx_addon_dir/src/php/php_ngx.h \
-				$ngx_addon_dir/src/php/php_ngx_log.h \
-				$ngx_addon_dir/src/php/php_ngx_core.h \
-				$ngx_addon_dir/src/php/php_ngx_request.h \
-				$ngx_addon_dir/src/php/php_ngx_execute.h \
-				$ngx_addon_dir/src/ngx_php_coroutine.h \
-				"
+                $ngx_addon_dir/src/ngx_http_php_core.h \
+                $ngx_addon_dir/src/ngx_http_php_directive.h \
+                $ngx_addon_dir/src/ngx_http_php_handler.h \
+                $ngx_addon_dir/src/ngx_http_php_request.h \
+                $ngx_addon_dir/src/ngx_http_php_zend_uthread.h \
+                $ngx_addon_dir/src/ngx_http_php_sleep.h \
+                $ngx_addon_dir/src/ngx_php_debug.h \
+                $ngx_addon_dir/src/php/impl/php_ngx.h \
+                $ngx_addon_dir/src/php/impl/php_ngx_test.h \
+                $ngx_addon_dir/src/php/impl/php_ngx_track.h \
+                $ngx_addon_dir/src/php/impl/php_ngx_core.h \
+                $ngx_addon_dir/src/php/impl/php_ngx_log.h \
+                $ngx_addon_dir/src/php/impl/php_ngx_request.h \
+                $ngx_addon_dir/src/php/impl/php_ngx_generator.h \
+                "
 
 CORE_INCS="$CORE_INCS $PHP_INC $PHP_INC/main $PHP_INC/TSRM $PHP_INC/Zend $PHP_INC/ext $PHP_INC/ext/date/lib $PHP_INC/sapi/embed "
 
-CORE_LIBS="$CORE_LIBS `$PHP_BIN/php-config --ldflags` -L$PHP_LIB -lphp5 `$PHP_BIN/php-config --libs` "
+CORE_LIBS="$CORE_LIBS `$PHP_BIN/php-config --ldflags` -L$PHP_LIB -lphp7 `$PHP_BIN/php-config --libs` "
 
-PHP_ROOT="/disk4/local/php56"
+#CORE_INCS="$CORE_INCS /disk4/local/php71/include/php /disk4/local/php71/include/php/main /disk4/local/php71/include/php/TSRM /disk4/local/php71/include/php/Zend /disk4/local/php71/include/php/ext /disk4/local/php71/include/php/ext/date/lib /disk4/local/php71/include/php/sapi/embed "
 
-#CORE_INCS="$CORE_INCS $PHP_ROOT/include/php $PHP_ROOT/include/php/main $PHP_ROOT/include/php/TSRM $PHP_ROOT/include/php/Zend $PHP_ROOT/include/php/ext $PHP_ROOT/include/php/ext/date/lib $PHP_ROOT/include/php/sapi/embed "
-
-#CORE_LIBS="$CORE_LIBS `$PHP_ROOT/bin/php-config --ldflags` -L$PHP_ROOT/lib -lphp5 `$PHP_ROOT/bin/php-config --libs` "
+#CORE_LIBS="$CORE_LIBS `/disk4/local/php71/bin/php-config --ldflags` -L/disk4/local/php71/lib -lphp7 `/disk4/local/php71/bin/php-config --libs` "
 
 have=NDK_SET_VAR . auto/have

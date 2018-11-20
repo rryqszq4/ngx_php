@@ -1,5 +1,5 @@
 /**
- *    Copyright(c) 2016-2018 rryqszq4
+ *    Copyright(c) 2016-2017 rryqszq4
  *
  *
  */
@@ -10,7 +10,5 @@
 #include "ngx_http_php_module.h"
 
 ngx_int_t ngx_http_php_sleep(ngx_http_request_t *r);
-
-ngx_int_t ngx_http_php_cosleep(ngx_http_request_t *r);
 
 #endif
