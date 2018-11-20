@@ -7,6 +7,8 @@ NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/src/ngx_http_php_module.c \
                 $ngx_addon_dir/src/ngx_http_php_request.c \
                 $ngx_addon_dir/src/ngx_http_php_zend_uthread.c \
                 $ngx_addon_dir/src/ngx_http_php_sleep.c \
+                $ngx_addon_dir/src/ngx_http_php_socket.c \
+                $ngx_addon_dir/src/ngx_http_php_util.c \
                 $ngx_addon_dir/src/ngx_php_debug.c \
                 $ngx_addon_dir/src/php/impl/php_ngx.c \
                 $ngx_addon_dir/src/php/impl/php_ngx_test.c \
@@ -15,6 +17,7 @@ NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/src/ngx_http_php_module.c \
                 $ngx_addon_dir/src/php/impl/php_ngx_log.c \
                 $ngx_addon_dir/src/php/impl/php_ngx_request.c \
                 $ngx_addon_dir/src/php/impl/php_ngx_generator.c \
+                $ngx_addon_dir/src/php/impl/php_ngx_socket.c \
                 "
 NGX_ADDON_DEPS="$NGX_ADDON_DEPS $ngx_addon_dir/src/ngx_http_php_module.h \
                 $ngx_addon_dir/src/ngx_http_php_core.h \
@@ -23,6 +26,8 @@ NGX_ADDON_DEPS="$NGX_ADDON_DEPS $ngx_addon_dir/src/ngx_http_php_module.h \
                 $ngx_addon_dir/src/ngx_http_php_request.h \
                 $ngx_addon_dir/src/ngx_http_php_zend_uthread.h \
                 $ngx_addon_dir/src/ngx_http_php_sleep.h \
+                $ngx_addon_dir/src/ngx_http_php_socket.h \
+                $ngx_addon_dir/src/ngx_http_php_util.h \
                 $ngx_addon_dir/src/ngx_php_debug.h \
                 $ngx_addon_dir/src/php/impl/php_ngx.h \
                 $ngx_addon_dir/src/php/impl/php_ngx_test.h \
@@ -31,14 +36,15 @@ NGX_ADDON_DEPS="$NGX_ADDON_DEPS $ngx_addon_dir/src/ngx_http_php_module.h \
                 $ngx_addon_dir/src/php/impl/php_ngx_log.h \
                 $ngx_addon_dir/src/php/impl/php_ngx_request.h \
                 $ngx_addon_dir/src/php/impl/php_ngx_generator.h \
+                $ngx_addon_dir/src/php/impl/php_ngx_socket.h \
                 "
 
 CORE_INCS="$CORE_INCS $PHP_INC $PHP_INC/main $PHP_INC/TSRM $PHP_INC/Zend $PHP_INC/ext $PHP_INC/ext/date/lib $PHP_INC/sapi/embed "
 
 CORE_LIBS="$CORE_LIBS `$PHP_BIN/php-config --ldflags` -L$PHP_LIB -lphp7 `$PHP_BIN/php-config --libs` "
 
-#CORE_INCS="$CORE_INCS /disk4/local/php71/include/php /disk4/local/php71/include/php/main /disk4/local/php71/include/php/TSRM /disk4/local/php71/include/php/Zend /disk4/local/php71/include/php/ext /disk4/local/php71/include/php/ext/date/lib /disk4/local/php71/include/php/sapi/embed "
+#CORE_INCS="$CORE_INCS /usr/local/php72/include/php /usr/local/php72/include/php/main /usr/local/php72/include/php/TSRM /usr/local/php72/include/php/Zend /usr/local/php72/include/php/ext /usr/local/php72/include/php/ext/date/lib /usr/local/php72/include/php/sapi/embed "
 
-#CORE_LIBS="$CORE_LIBS `/disk4/local/php71/bin/php-config --ldflags` -L/disk4/local/php71/lib -lphp7 `/disk4/local/php71/bin/php-config --libs` "
+#CORE_LIBS="$CORE_LIBS `/usr/local/php72/bin/php-config --ldflags` -L/usr/local/php72/lib -lphp7 `/usr/local/php72/bin/php-config --libs` "
 
 have=NDK_SET_VAR . auto/have

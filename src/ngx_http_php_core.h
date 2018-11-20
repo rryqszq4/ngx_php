@@ -11,6 +11,8 @@
 #include <php_embed.h>
 #include "php/impl/php_ngx.h"
 
+#include "ngx_http_php_socket.h"
+
 #define OUTPUT_CONTENT  1<<0
 #define OUTPUT_OPCODE   1<<1
 #define OUTPUT_STACK    1<<2
@@ -33,6 +35,7 @@ typedef struct ngx_http_php_code_t {
         char *string;
     } code;
     code_type_t code_type;
+    ngx_str_t code_id;
 } ngx_http_php_code_t;
 
 #if defined(NDK) && NDK
@@ -61,6 +64,7 @@ typedef struct ngx_http_php_ctx_t {
     size_t body_length;
     ngx_str_t request_body_ctx;
     unsigned request_body_more : 1;
+    unsigned read_request_body_done : 1;
 
     unsigned enable_async : 1;
     unsigned enable_thread : 1;
@@ -96,6 +100,10 @@ typedef struct ngx_http_php_ctx_t {
 
     ngx_int_t delay_time;
     ngx_event_t sleep;
+
+    ngx_http_php_socket_upstream_t  *upstream;
+    ngx_str_t   host;
+    in_port_t   port;
 
 } ngx_http_php_ctx_t;
 

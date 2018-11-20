@@ -8,10 +8,9 @@
 #include "php_ini.h"
 #include "ext/standard/info.h"
 #include "php_ngx.h"
+#include "php_ngx_core.h"
 
 #include "../../ngx_http_php_module.h"
-
-#include "php_ngx_test.h"
 
 /* If you declare any globals in php_php_ngx.h uncomment this: */
 ZEND_DECLARE_MODULE_GLOBALS(php_ngx)
@@ -77,8 +76,6 @@ PHP_MINIT_FUNCTION(php_ngx)
     /* If you have INI entries, uncomment these lines
     REGISTER_INI_ENTRIES();
     */
-
-    ngx_test_init(module_number TSRMLS_CC);
 
     return SUCCESS;
 }
@@ -303,6 +300,7 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry additional_functions[] = {
     ZEND_FE(dl, arginfo_dl)
+    PHP_FE(ngx_sleep, NULL)
     {NULL, NULL, NULL, 0, 0}
 };
 

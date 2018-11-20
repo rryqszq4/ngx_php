@@ -1,9 +1,22 @@
-2018-01-06 rryqszq4 <rryqszq@gmail.com>
+ngx_php7 0.0.12 changes:                                                            10 Apr 2018
+    * Add php impl ngx_socket::connect, ngx_socket::send, ngx_socket::recv, ngx_socket::close.
+    
+    * Add php impl ngx::post_args.
+
+    * Hidden main function definition, ex: 'ngx_content_2067061a67861d80610804313d66a8f7'.
+
+    * Fixd at zend_uthread, valid before change to valid after in zend_uthread_resume function, yield;ngx::sleep change to yield ngx::sleep.
+
+ngx_php7 0.0.11 changes:                                                            12 Jan 2018
     * Add php impl ngx_request for replace $_SERVER, not support $_SERVER.
 
     * Add php impl ngx::sleep with ngx sleep event handler. 
 
     * Add php impl ngx::query_args.
+
+    * Add macros ngx_php_debug.
+
+    * Remove impl ngx_generator class.
 
 2017-03-29 rryqszq4 <rryqszq@gmail.com>
     * add ngx_generator for coroutine
