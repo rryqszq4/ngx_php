@@ -13,7 +13,7 @@ ngx_php7
 Requirement
 -----------
 - PHP-7.0.* ~ PHP-7.2.*
-- nginx-1.4.7 ~ nginx-1.10.3
+- nginx-1.4.7 ~ nginx-1.14.2 and mainline 1.15.7
 
 Installation
 -------
@@ -31,6 +31,7 @@ $ wget 'http://nginx.org/download/nginx-1.10.3.tar.gz'
 $ tar -zxvf nginx-1.10.3.tar.gz
 $ cd nginx-1.10.3
 
+$ export PHP_CONFIG=/path/to/php/bin/php-config
 $ export PHP_BIN=/path/to/php/bin
 $ export PHP_INC=/path/to/php/include/php
 $ export PHP_LIB=/path/to/php/lib
@@ -40,6 +41,7 @@ $             --prefix=/path/to/nginx \
 $             --with-ld-opt="-Wl,-rpath,$PHP_LIB" \
 $             --add-module=/path/to/ngx_php7/third_party/ngx_devel_kit \
 $             --add-module=/path/to/ngx_php7
+$ make && make install
 ```
 
 Synopsis
@@ -118,11 +120,41 @@ http {
             ';
         }
 
+        location = /ngx_socket2 {
+            default_type 'application/json;charset=UTF-8';
+            content_by_php '
+                $fd = ngx_socket_create();
+                var_dump($fd);
+                yield ngx_socket_connect($fd, "hq.sinajs.cn", 80);
+                $send_buf = "GET /list=s_sh000001 HTTP/1.0\r\n
+                                            Host: hq.sinajs.cn\r\nConnection: close\r\n\r\n";
+                yield ngx_socket_send($fd, $send_buf, strlen($send_buf));
+                $recv_buf = "";
+                yield ngx_socket_recv($fd, $recv_buf);
+                var_dump($recv_buf);
+                yield ngx_socket_close($fd);
+            ';
+        }
+
         location = /ngx_var {
             set $a 1234567890;
             content_by_php '
                 $a = ngx_var::get("a");
                 var_dump($a);
+            ';
+        }
+        
+        # run a php file
+        location = /php {
+            content_by_php '
+                include "name_of_php_file.php";
+            ';
+        }
+        
+        # run any php file in root
+        location = / {
+            content_by_php '
+                include ngx_var::get("uri");
             ';
         }
 
@@ -214,6 +246,36 @@ body_filter_by_php
 * **syntax:** `body_filter_by_php`_`<php script code>`_
 * **context:** `http, server, location, location if`
 * **phase:** `output-body-filter`
+
+
+Nginx API for php
+-----------------
+* [ngx_exit](#ngx_exit)
+* [ngx_query_args](#ngx_query_args)
+* [ngx_post_args](#ngx_post_args)
+* [ngx_sleep](#ngx_sleep)
+* [ngx_log_error](#ngx_log_error)
+* [ngx_request_method](#ngx_request_method)
+* [ngx_request_document_root](#ngx_request_document_root)
+* [ngx_request_document_uri](#ngx_request_document_uri)
+* [ngx_request_script_name](#ngx_request_script_name)
+* [ngx_request_script_filename](#ngx_request_script_filename)
+* [ngx_request_query_string](#ngx_request_query_string)
+* [ngx_request_uri](#ngx_request_uri)
+* [ngx_request_server_protocol](#ngx_request_server_protocol)
+* [ngx_request_remote_addr](#ngx_request_remote_addr)
+* [ngx_request_server_addr](#ngx_request_server_addr)
+* [ngx_request_remote_port](#ngx_request_remote_port)
+* [ngx_request_server_port](#ngx_request_server_port)
+* [ngx_request_server_name](#ngx_request_server_name)
+* [ngx_request_headers](#ngx_request_headers)
+* [ngx_socket_create](#ngx_socket_create)
+* [ngx_socket_connect](#ngx_socket_connect)
+* [ngx_socket_close](#ngx_socket_close)
+* [ngx_socket_send](#ngx_socket_send)
+* [ngx_socket_recv](#ngx_socket_recv)
+* [ngx_var_get](#ngx_var_get)
+* [ngx_var_set](#ngx_var_set)
 
 
 Copyright and License

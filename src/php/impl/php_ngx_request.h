@@ -7,11 +7,67 @@
 #ifndef _PHP_NGX_REQUEST_H_
 #define _PHP_NGX_REQUEST_H_
 
-#include <ngx_http.h>
-
 #include <php.h>
 #include <php_ini.h>
 #include <ext/standard/info.h>
+#include <ngx_http.h>
+
+ZEND_BEGIN_ARG_INFO_EX(ngx_request_method_arginfo, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(ngx_request_document_root_arginfo, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(ngx_request_document_uri_arginfo, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(ngx_request_script_name_arginfo, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(ngx_request_script_filename_arginfo, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(ngx_request_query_string_arginfo, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(ngx_request_request_uri_arginfo, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(ngx_request_server_protocol_arginfo, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(ngx_request_remote_addr_arginfo, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(ngx_request_server_addr_arginfo, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(ngx_request_remote_port_arginfo, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(ngx_request_server_port_arginfo, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(ngx_request_server_name_arginfo, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(ngx_request_headers_arginfo, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
+PHP_FUNCTION(ngx_request_method);
+PHP_FUNCTION(ngx_request_document_root);
+PHP_FUNCTION(ngx_request_document_uri);
+PHP_FUNCTION(ngx_request_script_name);
+PHP_FUNCTION(ngx_request_script_filename);
+PHP_FUNCTION(ngx_request_query_string);
+PHP_FUNCTION(ngx_request_uri);
+PHP_FUNCTION(ngx_request_server_protocol);
+PHP_FUNCTION(ngx_request_remote_addr);
+PHP_FUNCTION(ngx_request_server_addr);
+PHP_FUNCTION(ngx_request_remote_port);
+PHP_FUNCTION(ngx_request_server_port);
+PHP_FUNCTION(ngx_request_server_name);
+PHP_FUNCTION(ngx_request_headers);
 
 PHP_METHOD(ngx_request, method);
 PHP_METHOD(ngx_request, document_root);
