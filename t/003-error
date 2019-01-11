@@ -5,17 +5,22 @@ use Test::Nginx::Socket 'no_plan';
 run_tests();
 
 __DATA__
-
 === TEST 1: error
 error
 --- config
 location = /error {
     content_by_php '
-		echo "hello ngx_php";
-		$a = new abc();
-	';
+        echo "hello ngx_php";
+        $a = new abc();
+    ';
 }
 --- request
 GET /error
 --- response_body
-hello ngx_php{! Fatal error: Class 'abc' not found in ngx_php eval code on line 3 !}
+hello ngx_php
+Fatal error: Uncaught Error: Class 'abc' not found in ngx_php eval code:4
+Stack trace:
+#0 [internal function]: ngx_content_6a50af555ddc38eb1560f83e04f54a6c()
+#1 {main}
+  thrown in ngx_php eval code on line 4
+

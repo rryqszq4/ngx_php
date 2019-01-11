@@ -11,6 +11,4 @@
 
 ngx_int_t ngx_http_php_sleep(ngx_http_request_t *r);
 
-ngx_int_t ngx_http_php_cosleep(ngx_http_request_t *r);
-
 #endif

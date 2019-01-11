@@ -1,42 +1,34 @@
 ngx_php
-=======
-
-[![Build Status](https://travis-ci.org/rryqszq4/ngx_php.svg?branch=master)](https://travis-ci.org/rryqszq4/ngx_php) 
-[![Gitter](https://badges.gitter.im/rryqszq4/ngx_php.svg)](https://gitter.im/rryqszq4/ngx_php?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-[![GitHub release](https://img.shields.io/github/release/rryqszq4/ngx_php.svg)](https://github.com/rryqszq4/ngx_php/releases/latest)
+========
+[![Build Status](https://travis-ci.org/rryqszq4/ngx_php.svg?branch=ngx_php7)](https://travis-ci.org/rryqszq4/ngx_php)
 [![license](https://img.shields.io/badge/license-BSD--2--Clause-blue.svg)](https://github.com/rryqszq4/ngx_php/blob/master/LICENSE)
 [![QQ group](https://img.shields.io/badge/QQ--group-558795330-26bcf5.svg)](https://github.com/rryqszq4/ngx_php)
 
+![](https://raw.githubusercontent.com/rryqszq4/ngx_php/ngx_php7/docs/hello_world_performance.png)
+
+[ngx_php7](https://github.com/rryqszq4/ngx_php7) - Embedded php7 programming language for nginx-module.  
 [ngx_php](https://github.com/rryqszq4/ngx_php) - Embedded php script language for nginx-module.  
-[ngx_php7](https://github.com/rryqszq4/ngx_php7) - Embedded php7 programming language for nginx-module. 
 
 Requirement
 -----------
-- PHP 5.5.* ~ PHP 5.6.*
-- nginx-1.7.12 ~ nginx-1.11.8
+- PHP-7.0.* ~ PHP-7.2.*
+- nginx-1.4.7 ~ nginx-1.10.3
 
 Installation
 -------
-**build php**
-
 ```sh
-$ wget 'http://php.net/distributions/php-5.6.30.tar.gz'
-$ tar xf php-5.6.30.tar.gz
-$ cd php-5.6.30
+$ wget 'http://php.net/distributions/php-7.1.16.tar.gz'
+$ tar xf php-7.1.16.tar.gz
+$ cd php-7.1.16
 
-$ ./configure --prefix=/path/to/php \
-$             --enable-embed
+$ ./configure --prefix=/path/to/php --enable-embed
 $ make && make install
-```
 
-**build ngx_php**
-
-```sh
 $ git clone https://github.com/rryqszq4/ngx_php.git
 
-$ wget 'http://nginx.org/download/nginx-1.7.12.tar.gz'
-$ tar xf nginx-1.7.12.tar.gz
-$ cd nginx-1.7.12
+$ wget 'http://nginx.org/download/nginx-1.10.3.tar.gz'
+$ tar -zxvf nginx-1.10.3.tar.gz
+$ cd nginx-1.10.3
 
 $ export PHP_BIN=/path/to/php/bin
 $ export PHP_INC=/path/to/php/include/php
@@ -45,9 +37,8 @@ $ export PHP_LIB=/path/to/php/lib
 $ ./configure --user=www --group=www \
 $             --prefix=/path/to/nginx \
 $             --with-ld-opt="-Wl,-rpath,$PHP_LIB" \
-$             --add-module=/path/to/ngx_php/dev/ngx_devel_kit \
+$             --add-module=/path/to/ngx_php/third_party/ngx_devel_kit \
 $             --add-module=/path/to/ngx_php
-$ make && make install
 ```
 
 Synopsis
@@ -67,63 +58,113 @@ http {
 
     keepalive_timeout  65;
     
-    client_max_body_size 10m;   
-    client_body_buffer_size 4096k;
+    client_max_body_size 64k;   
+    client_body_buffer_size 64k;
 
     php_ini_path /usr/local/php/etc/php.ini;
 
     server {
         listen       80;
         server_name  localhost;
+        default_type 'application/json; charset=UTF-8';
     
         location /php {
             content_by_php '
                 echo "hello ngx_php";
             ';
         }
+
+        location = /ngx_request {
+            content_by_php '
+                echo ngx_request::document_uri();
+            ';
+        }
+
+        # curl /ngx_get?a=1&b=2
+        location = /ngx_get {
+            content_by_php '
+                echo "ngx::query_args()\n";
+                var_dump(ngx::query_args());
+            ';
+        }
+
+        # curl -d 'a=1&b=2' /ngx_post
+        location = /ngx_post {
+            content_by_php '
+                echo "ngx::post_args()\n";
+                var_dump(ngx::post_args());
+            ';
+        }
+
+        location = /ngx_sleep {
+            content_by_php '
+                echo "ngx_sleep start\n";
+                yield ngx::sleep(1);
+                echo "ngx_sleep end\n";
+            ';
+        }
+
+        location = /ngx_socket {
+            default_type 'application/json;charset=UTF-8';
+            content_by_php '
+                yield ngx_socket::connect("hq.sinajs.cn", 80);
+                yield ngx_socket::send("GET /list=s_sh000001 HTTP/1.0\r\n
+                                        Host: hq.sinajs.cn\r\nConnection: close\r\n\r\n");
+                yield $ret = ngx_socket::recv(1024);
+                yield ngx_socket::close();
+                
+                var_dump($ret);
+            ';
+        }
+
+        location = /ngx_var {
+            set $a 1234567890;
+            content_by_php '
+                $a = ngx_var::get("a");
+                var_dump($a);
+            ';
+        }
+
     }
 }
 ```
 
 Test
 ----
-Using the perl of [Test::Nginx](https://github.com/openresty/test-nginx) module to testing, searching and finding out problem in ngx_php. 
-
+Using the perl of [Test::Nginx](https://github.com/openresty/test-nginx) module to testing, searching and finding out problem in ngx_php7.
 ```sh
-cd /path/to/ngx_php
-export PATH=/path/to/nginx/sbin:$PATH
-prove -r t
-```
-Test result:
-
-```sh
+ngx_php7 test ...
+nginx version: nginx/1.10.3
+built by gcc 4.8.4 (Ubuntu 4.8.4-2ubuntu1~14.04.3) 
+configure arguments: --prefix=/home/travis/build/rryqszq4/ngx_php7/build/nginx --with-ld-opt=-Wl,-rpath,/home/travis/build/rryqszq4/ngx_php7/build/php/lib --add-module=../../../ngx_php7/third_party/ngx_devel_kit --add-module=../../../ngx_php7
 t/001-hello.t ........... ok
-t/008-error.t ........... ok
-t/200-rewrite_by_php.t .. ok
-t/202-access_by_php.t ... ok
-t/204-content_by_php.t .. ok
+t/002-ini.t ............. ok
+t/004-ngx_request.t ..... ok
+t/005-ngx_log.t ......... ok
+t/006-ngx_sleep.t ....... ok
+t/007-ngx_socket.t ...... ok
+t/008-ngx_exit.t ........ ok
+t/009-ngx_query_args.t .. ok
+t/010-ngx_post_args.t ... ok
+t/011-ngx_constants.t ... ok
+t/012-function.t ........ ok
+t/013-class.t ........... ok
+t/014-ngx_var.t ......... ok
 All tests successful.
-Files=5, Tests=22,  2 wallclock secs ( 0.04 usr  0.01 sys +  0.65 cusr  0.32 csys =  1.02 CPU)
+Files=13, Tests=28,  5 wallclock secs ( 0.05 usr  0.02 sys +  1.26 cusr  0.22 csys =  1.55 CPU)
 Result: PASS
 ```
 
 Directives
 ----------
 * [php_ini_path](#php_ini_path)
-* [init_by_php](#init_by_php)
-* [init_by_php_file](#init_by_php_file)
+* [init_worker_by_php](#init_worker_by_php)
 * [rewrite_by_php](#rewrite_by_php)
-* [rewrite_by_php_file](#rewrite_by_php_file)
 * [access_by_php](#access_by_php)
-* [access_by_php_file](#access_by_php_file)
 * [content_by_php](#content_by_php)
-* [content_by_php_file](#content_by_php_file)
 * [log_by_php](#log_by_php)
-* [log_by_php_file](#log_by_php_file)
-* [set_by_php](#set_by_php)
-* [set_run_by_php](#set_run_by_php)
-* [set_by_php_file](#set_by_php_file)
-* [set_run_by_php_file](#set_run_by_php_file)
+* [header_filter_by_php](#header_filter_by_php)
+* [body_filter_by_php](#body_filter_by_php)
 
 php_ini_path
 ------------
@@ -131,27 +172,11 @@ php_ini_path
 * **context:** `http`
 * **phase:** `loading-config`
 
-Loading php configuration file in nginx configuration initialization.
-
-```nginx
-php_ini_path /usr/local/php/etc/php.ini;
-```
-
-init_by_php
------------
-* **syntax:** `init_by_php`_`<php script code>`_
+init_worker_by_php
+------------------
+* **syntax:** `init_worker_by_php`_`<php script code>`_
 * **context:** `http`
-* **phase:** `loading-config`
-
-In nginx configuration initialization or boot time, run some php scripts.
-
-init_by_php_file
-----------------
-* **syntax:** `init_by_php_file`_`<php script file>`_
-* **context:** `http`
-* **phase:** `loading-config`
-
-In nginx configuration initialization or boot time, run some php script file.
+* **phase:** `starting-worker`
 
 rewrite_by_php
 --------------
@@ -159,40 +184,11 @@ rewrite_by_php
 * **context:** `http, server, location, location if`
 * **phase:** `rewrite`
 
-Use php script redirect in nginx rewrite stage of.
-
-```nginx
-location /rewrite_by_php {
-        rewrite_by_php "
-            echo "rewrite_by_php";
-            header('Location: http://www.baidu.com/');
-        ";
-    }
-```
-
-rewrite_by_php_file
--------------------
-* **syntax:** `rewrite_by_php_file`_`<php script file>`_
-* **context:** `http, server, location, location if`
-* **phase:** `rewrite`
-
-Use php script file, redirect in nginx rewrite stage of.
-
 access_by_php
 -------------
 * **syntax:** `access_by_php`_`<php script code>`_
 * **context:** `http, server, location, location if`
 * **phase:** `access`
-
-Nginx in the access phase, the php script determine access.
-
-access_by_php_file
-------------------
-* **syntax:** `access_by_php_file`_`<php script file>`_
-* **context:** `http, server, location, location if`
-* **phase:** `access`
-
-Nginx in the access phase, the php script file Analyzing access.
 
 content_by_php
 --------------
@@ -200,113 +196,29 @@ content_by_php
 * **context:** `http, server, location, location if`
 * **phase:** `content`
 
-Most central command, run php script nginx stage of content.
-```nginx
-location /content_by_php {    
-    content_by_php "
-        header('Content-Type: text/html;charset=UTF-8');
-    
-        echo phpinfo();
-    ";
-        
-}
-```
-
-content_by_php_file
--------------------
-* **syntax:** `content_by_php_file`_`<php script file>`_
-* **context:** `http, server, location, location if`
-* **phase:** `content`
-
-Most central command, run php script file nginx stage of content.
-```nginx
-location /content_by_php_file {
-        content_by_php_file /home/www/index.php;
-}
-```
-
 log_by_php
 ----------
 * **syntax:** `log_by_php`_`<php script code>`_
 * **context:** `http, server, location, location if`
 * **phase:** `log`
 
-log_by_php_file
----------------
-* **syntax:** `log_by_php_file`_`<php script file>`_
+header_filter_by_php
+--------------------
+* **syntax:** `header_filter_by_php`_`<php script code>`_
 * **context:** `http, server, location, location if`
-* **phase:** `log`
+* **phase:** `output-header-filter`
 
-set_by_php
-----------
-* **syntax:** `set_by_php`_`<php script code>`_
-* **context:** `server, server if, location, location if`
-* **phase:** `content`
+body_filter_by_php
+------------------
+* **syntax:** `body_filter_by_php`_`<php script code>`_
+* **context:** `http, server, location, location if`
+* **phase:** `output-body-filter`
 
-set_run_by_php
---------------
-* **syntax:** `set_run_by_php`_`<php script code>`_
-* **context:** `server, server if, location, location if`
-* **phase:** `content`
-
-set_by_php_file
----------------
-* **syntax:** `set_by_php_file`_`<php script file>`_
-* **context:** `server, server if, location, location if`
-* **phase:** `content`
-
-set_run_by_php_file
--------------------
-* **syntax:** `set_run_by_php_file`_`<php script file>`_
-* **context:** `server, server if, location, location if`
-* **phase:** `content`
-
-
-Nginx API for php
------------------
-* [ngx::_exit](#ngx_exit)
-* [ngx_log::error](#ngx_logerror)
-
-ngx::_exit
-----------
-* **syntax:** `ngx::_exit(int $status)`
-* **context:** `content_by_php`
-
-```php
-echo "start\n";
-ngx::_exit(200);
-echo "end\n";
-```
-
-ngx_log::error
---------------
-* **syntax:** `ngx_log::error(int level, string log)`
-* **context:** `content_by_php`
-
-Nginx log of level in php.
-* NGX_LOG_STDERR
-* NGX_LOG_EMERG
-* NGX_LOG_ALERT
-* NGX_LOG_CRIT
-* NGX_LOG_ERR
-* NGX_LOG_WARN
-* NGX_LOG_NOTICE
-* NGX_LOG_INFO
-* NGX_LOG_DEBUG
-
-```php
-ngx_log::error(NGX_LOG_ERR, "test");
-
-/*
- 2016/10/06 22:10:19 [error] 51402#0: *1 test while reading response header from upstream, client: 192.168.80.1, 
- server: localhost, request: "GET /_mysql HTTP/1.1", upstream: "127.0.0.1:3306", host: "192.168.80.140"
-*/
-```
 
 Copyright and License
 ---------------------
 ```
-Copyright (c) 2016-2017, rryqszq4 <rryqszq@gmail.com>  
+Copyright (c) 2016-2018, rryqszq4 <rryqszq@gmail.com>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

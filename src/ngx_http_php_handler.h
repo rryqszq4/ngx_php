@@ -30,26 +30,33 @@ ngx_int_t ngx_http_php_access_inline_handler(ngx_http_request_t *r);
 ngx_int_t ngx_http_php_content_handler(ngx_http_request_t *r);
 ngx_int_t ngx_http_php_content_file_handler(ngx_http_request_t *r);
 ngx_int_t ngx_http_php_content_inline_handler(ngx_http_request_t *r);
-
 ngx_int_t ngx_http_php_content_post_handler(ngx_http_request_t *r);
 
-//ngx_int_t ngx_http_php_content_async_handler(ngx_http_request_t *r);
-//ngx_int_t ngx_http_php_content_async_inline_handler(ngx_http_request_t *r);
-//void *ngx_http_php_async_inline_thread(void *arg);
+ngx_int_t ngx_http_php_opcode_handler(ngx_http_request_t *r);
+ngx_int_t ngx_http_php_opcode_inline_handler(ngx_http_request_t *r);
 
-//ngx_int_t ngx_http_php_content_sync_inline_handler(ngx_http_request_t *r);
-//ngx_int_t ngx_http_php_content_thread_inline_handler(ngx_http_request_t *r);
-//void *ngx_http_php_sync_inline_thread(void *arg);
-//ngx_int_t ngx_http_php_content_thread_file_handler(ngx_http_request_t *r);
-//void *ngx_http_php_sync_file_thread(void *arg);
+ngx_int_t ngx_http_php_stack_handler(ngx_http_request_t *r);
+ngx_int_t ngx_http_php_stack_inline_handler(ngx_http_request_t *r);
+
+/*ngx_int_t ngx_http_php_content_async_handler(ngx_http_request_t *r);
+ngx_int_t ngx_http_php_content_async_inline_handler(ngx_http_request_t *r);
+void *ngx_http_php_async_inline_thread(void *arg);
+
+ngx_int_t ngx_http_php_content_sync_inline_handler(ngx_http_request_t *r);
+void *ngx_http_php_sync_inline_thread(void *arg);*/
 
 ngx_int_t ngx_http_php_log_handler(ngx_http_request_t *r);
 ngx_int_t ngx_http_php_log_file_handler(ngx_http_request_t *r);
 ngx_int_t ngx_http_php_log_inline_handler(ngx_http_request_t *r);
 
-ngx_int_t ngx_http_php_set_inline_handler(ngx_http_request_t *r, ngx_str_t *val, ngx_http_variable_value_t *v, void *data);
-ngx_int_t ngx_http_php_set_run_inline_handler(ngx_http_request_t *r, ngx_str_t *val, ngx_http_variable_value_t *v, void *data);
-ngx_int_t ngx_http_php_set_file_handler(ngx_http_request_t *r, ngx_str_t *val, ngx_http_variable_value_t *v, void *data);
-ngx_int_t ngx_http_php_set_run_file_handler(ngx_http_request_t *r, ngx_str_t *val, ngx_http_variable_value_t *v, void *data);
+// filter functions
+void ngx_http_php_header_filter_init(void);
+void ngx_http_php_body_filter_init(void);
+
+ngx_int_t ngx_http_php_header_filter(ngx_http_request_t *r);
+ngx_int_t ngx_http_php_header_filter_inline_handler(ngx_http_request_t *r);
+
+ngx_int_t ngx_http_php_body_filter(ngx_http_request_t *r, ngx_chain_t *in);
+ngx_int_t ngx_http_php_body_filter_inline_handler(ngx_http_request_t *r, ngx_chain_t *in);
 
 #endif

@@ -53,6 +53,7 @@
 
 #endif
 
+
 #if defined(NGX_PHP_DEBUG) && (NGX_PHP_DEBUG)
 
     #if (NGX_HAVE_VARIADIC_MACROS)
@@ -91,7 +92,6 @@
     #endif
 
 #endif
-
 
 #if defined(NGX_PHP_DEBUG) && (NGX_PHP_DEBUG)
 

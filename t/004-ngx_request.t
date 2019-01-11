@@ -17,3 +17,4 @@ location = /ngx_request {
 GET /ngx_request
 --- response_body
 string(12) "/ngx_request"
+

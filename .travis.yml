@@ -1,5 +1,6 @@
 language: c
 sudo: required
+dist: trusty
 addons:
   apt:
     packages:
@@ -18,25 +19,26 @@ addons:
       - libxpm-dev
       - libt1-dev
       - cpanminus
+      - openssl
+      - libssl-dev
+      - libbz2-dev
 compiler:
   - gcc
 cache:
   - apt
 env:
-  #- PHP_SRC_VERSION=5.3.29
-  #  NGINX_SRC_VERSION=1.7.12
-  #- PHP_SRC_VERSION=5.4.45
-  #  NGINX_SRC_VERSION=1.7.12
-  #- PHP_SRC_VERSION=5.5.38
-  #  NGINX_SRC_VERSION=1.7.12
-  - PHP_SRC_VERSION=5.6.36
+  - PHP_SRC_VERSION=7.0.30
     NGINX_SRC_VERSION=1.10.3
-  - PHP_SRC_VERSION=5.6.36
-    NGINX_SRC_VERSION=1.8.1
+  - PHP_SRC_VERSION=7.1.19
+    NGINX_SRC_VERSION=1.10.3
+  - PHP_SRC_VERSION=7.2.7
+    NGINX_SRC_VERSION=1.10.3
+  - PHP_SRC_VERSION=7.2.7
+    NGINX_SRC_VERSION=1.10.3
+    NGINX_MODULE=DYNAMIC
 install:
   - sudo cpanm -n Test::Nginx
 before_script:
-  - ./travis/compile.sh
-
+  - ./.travis/compiler.sh
 script:
-  - ./travis/test.sh
+  - ./.travis/test.sh

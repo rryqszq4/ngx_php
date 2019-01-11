@@ -5,18 +5,17 @@ use Test::Nginx::Socket 'no_plan';
 run_tests();
 
 __DATA__
-=== TEST 1: ngx_log
-ngx_log
+=== TEST 1: ngx_exit
+ngx_exit
 --- config
-location = /ngx_log {
+location = /ngx_exit {
     content_by_php '
-        echo "ngx_log::error start\n";
-        ngx_log::error(NGX_LOG_ERR, "test");
-        echo "ngx_log::error end\n";
+        echo "ngx::_exit start\n";
+        ngx::_exit(NGX_OK);
+        echo "ngx::_exit end\n";
     ';
 }
 --- request
-GET /ngx_log
+GET /ngx_exit
 --- response_body
-ngx_log::error start
-ngx_log::error end
+ngx::_exit start
