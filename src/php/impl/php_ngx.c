@@ -9,6 +9,10 @@
 #include "ext/standard/info.h"
 #include "php_ngx.h"
 #include "php_ngx_core.h"
+#include "php_ngx_log.h"
+#include "php_ngx_request.h"
+#include "php_ngx_sockets.h"
+#include "php_ngx_var.h"
 
 #include "../../ngx_http_php_module.h"
 
@@ -232,35 +236,35 @@ static void php_ngx_register_variables(zval *track_vars_array TSRMLS_DC)
 }*/
 
 sapi_module_struct php_ngx_module = {
-    "php7-ngx",                       /* name */
-    "PHP Embedded Library for nginx-module",        /* pretty name */
+    "php7-ngx",                                         /* name */
+    "PHP Embedded Library for nginx-module",            /* pretty name */
 
-    php_ngx_startup,              /* startup */
-    php_module_shutdown_wrapper,   /* shutdown */
+    php_ngx_startup,                                    /* startup */
+    php_module_shutdown_wrapper,                        /* shutdown */
 
-    NULL,                          /* activate */
-    php_ngx_deactivate,           /* deactivate */
+    NULL,                                               /* activate */
+    php_ngx_deactivate,                                 /* deactivate */
 
-    php_ngx_ub_write,             /* unbuffered write */
-    php_ngx_flush,                /* flush */
-    NULL,                          /* get uid */
-    NULL,                          /* getenv */
+    php_ngx_ub_write,                                   /* unbuffered write */
+    php_ngx_flush,                                      /* flush */
+    NULL,                                               /* get uid */
+    NULL,                                               /* getenv */
 
-    php_error,                     /* error handler */
+    php_error,                                          /* error handler */
 
-    php_ngx_header_handler,                          /* header handler */
-    NULL,                          /* send headers handler */
-    NULL,          /* send header handler */
+    php_ngx_header_handler,                             /* header handler */
+    NULL,                                               /* send headers handler */
+    NULL,                                               /* send header handler */
 
-    php_ngx_read_post,                          /* read POST data */
-    php_ngx_read_cookies,         /* read Cookies */
+    php_ngx_read_post,                                  /* read POST data */
+    php_ngx_read_cookies,                               /* read Cookies */
 
-    php_ngx_register_variables,   /* register server variables */
-    NULL,          /* Log message */
-    NULL,                           /* Get request time */
-    NULL,                           /* Child terminate */
+    php_ngx_register_variables,                         /* register server variables */
+    NULL,                                               /* Log message */
+    NULL,                                               /* Get request time */
+    NULL,                                               /* Child terminate */
 
-    "",                             /* php_ini_path_override */
+    "",                                                 /* php_ini_path_override */
 
 #if PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION < 1
     NULL,
@@ -299,8 +303,39 @@ ZEND_END_ARG_INFO()
 /* }}} */
 
 static const zend_function_entry additional_functions[] = {
-    ZEND_FE(dl, arginfo_dl)
-    PHP_FE(ngx_sleep, NULL)
+    ZEND_FE(dl,                             arginfo_dl)
+
+    PHP_FE(ngx_exit,                        ngx_exit_arginfo)
+    PHP_FE(ngx_query_args,                  ngx_query_args_arginfo)
+    PHP_FE(ngx_post_args,                   ngx_post_args_arginfo)
+    PHP_FE(ngx_sleep,                       ngx_sleep_arginfo)
+
+    PHP_FE(ngx_log_error,                   ngx_log_error_arginfo)
+
+    PHP_FE(ngx_request_method,              ngx_request_method_arginfo)
+    PHP_FE(ngx_request_document_root,       ngx_request_document_root_arginfo)
+    PHP_FE(ngx_request_document_uri,        ngx_request_document_uri_arginfo)
+    PHP_FE(ngx_request_script_name,         ngx_request_script_name_arginfo)
+    PHP_FE(ngx_request_script_filename,     ngx_request_script_filename_arginfo)
+    PHP_FE(ngx_request_query_string,        ngx_request_query_string_arginfo)
+    PHP_FE(ngx_request_uri,                 ngx_request_request_uri_arginfo)
+    PHP_FE(ngx_request_server_protocol,     ngx_request_server_protocol_arginfo)
+    PHP_FE(ngx_request_remote_addr,         ngx_request_remote_addr_arginfo)
+    PHP_FE(ngx_request_server_addr,         ngx_request_server_addr_arginfo)
+    PHP_FE(ngx_request_remote_port,         ngx_request_remote_port_arginfo)
+    PHP_FE(ngx_request_server_port,         ngx_request_server_port_arginfo)
+    PHP_FE(ngx_request_server_name,         ngx_request_server_name_arginfo)
+    PHP_FE(ngx_request_headers,             ngx_request_headers_arginfo)
+
+    PHP_FE(ngx_socket_create,               arginfo_ngx_socket_create)
+    PHP_FE(ngx_socket_connect,              arginfo_ngx_socket_connect)
+    PHP_FE(ngx_socket_close,                arginfo_ngx_socket_close)
+    PHP_FE(ngx_socket_send,                 arginfo_ngx_socket_send)
+    PHP_FE(ngx_socket_recv,                 arginfo_ngx_socket_recv)
+
+    PHP_FE(ngx_var_get,                     ngx_var_get_arginfo)
+    PHP_FE(ngx_var_set,                     ngx_var_set_arginfo)
+
     {NULL, NULL, NULL, 0, 0}
 };
 
@@ -339,7 +374,7 @@ int php_ngx_module_init()
 #endif
 
 #ifdef PHP_WIN32
-  _fmode = _O_BINARY;           /*sets default for file streams to binary */
+  _fmode = _O_BINARY;                       /*sets default for file streams to binary */
   setmode(_fileno(stdin), O_BINARY);        /* make the stdio mode be binary */
   setmode(_fileno(stdout), O_BINARY);       /* make the stdio mode be binary */
   setmode(_fileno(stderr), O_BINARY);       /* make the stdio mode be binary */

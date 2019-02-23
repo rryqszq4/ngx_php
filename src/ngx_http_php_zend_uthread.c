@@ -4,7 +4,6 @@
  *
  */
 
-#include "ngx_php_debug.h"
 #include "ngx_http_php_module.h"
 #include "ngx_http_php_zend_uthread.h"
 #include "ngx_http_php_util.h"
@@ -457,11 +456,11 @@ ngx_http_php_zend_uthread_resume(ngx_http_request_t *r)
 
     ngx_http_php_ctx_t *ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
 
-    ngx_php_debug("ctx: %p", ctx);
-
     if (ctx == NULL) {
         
     }
+
+    ngx_php_debug("ctx: %p", ctx);
 
     zend_try {
         zval *closure;
@@ -471,6 +470,11 @@ ngx_http_php_zend_uthread_resume(ngx_http_request_t *r)
 
         closure = ctx->generator_closure;
 
+        if (ctx->upstream && ctx->upstream->enabled_receive == 1) {
+            ngx_php_debug("buf write in php var.");
+            ZVAL_STRINGL(ctx->recv_buf, (char *)ctx->upstream->buffer.pos, ctx->upstream->buffer.last - ctx->upstream->buffer.pos);
+        }
+
         ZVAL_STRING(&func_next, "next");
         call_user_function(NULL, closure, &func_next, &retval, 0, NULL TSRMLS_CC);
         zval_ptr_dtor(&func_next);
@@ -479,7 +483,7 @@ ngx_http_php_zend_uthread_resume(ngx_http_request_t *r)
         call_user_function(NULL, closure, &func_valid, &retval, 0, NULL TSRMLS_CC);
         zval_ptr_dtor(&func_valid);
 
-        ngx_php_debug("r:%p, closure:%p, retval:%d", r, closure, Z_TYPE(retval));
+        ngx_php_debug("r:%p, closure:%p, retval:%d,%d", r, closure, Z_TYPE(retval), IS_TRUE);
 
         if (Z_TYPE(retval) == IS_TRUE) {
             ctx->phase_status = NGX_AGAIN;
