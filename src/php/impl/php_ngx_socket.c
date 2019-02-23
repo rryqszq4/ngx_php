@@ -4,9 +4,9 @@
  *
  */
 
-#include "php_ngx_socket.h"
 #include "../../ngx_http_php_module.h"
 #include "../../ngx_http_php_socket.h"
+#include "php_ngx_socket.h"
 
 static zend_class_entry *php_ngx_socket_class_entry;
 
@@ -127,6 +127,7 @@ PHP_METHOD(ngx_socket, recv)
 
     ZVAL_STRINGL(return_value, (char *)b->pos, b->last - b->pos);
 
+    u->enabled_receive = 0;
 }
 
 PHP_METHOD(ngx_socket, close)

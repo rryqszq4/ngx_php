@@ -7,19 +7,22 @@
 #ifndef NGX_HTTP_PHP_MODULE_H
 #define NGX_HTTP_PHP_MODULE_H
 
+#include <php.h>
+#include <ngx_config.h>
+
+#include "ngx_php_debug.h"
+#include "ngx_http_php_core.h"
 #include <ngx_core.h>
 #include <ngx_http.h>
-#include <ngx_config.h>
 #include <nginx.h>
 
 #if defined(NDK) && NDK
 #include <ndk.h>
 #endif
 
-#include "ngx_http_php_core.h"
 
 #define NGX_HTTP_PHP_MODULE_NAME "ngx_php7"
-#define NGX_HTTP_PHP_MODULE_VERSION  "0.0.13"
+#define NGX_HTTP_PHP_MODULE_VERSION  "0.0.14"
 
 extern ngx_module_t ngx_http_php_module;
 ngx_http_request_t *ngx_php_request;

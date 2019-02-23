@@ -4,53 +4,13 @@
  *
  */
 
-#include "../../ngx_php_debug.h"
 #include "php_ngx_core.h"
 #include "../../ngx_http_php_module.h"
 #include "../../ngx_http_php_sleep.h"
 
 static zend_class_entry *php_ngx_class_entry;
 
-ZEND_BEGIN_ARG_INFO_EX(ngx_exit_arginfo, 0, 0, 1)
-    ZEND_ARG_INFO(0, status)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(ngx_query_args_arginfo, 0, 0, 1)
-    ZEND_ARG_INFO(0, key)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(ngx_post_args_arginfo, 0, 0, 1)
-    ZEND_ARG_INFO(0, key)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(ngx_sleep_arginfo, 0, 0, 1)
-    ZEND_ARG_INFO(0, time)
-ZEND_END_ARG_INFO()
-
-PHP_FUNCTION(ngx_sleep)
-{
-    ngx_http_request_t *r;
-    ngx_http_php_ctx_t *ctx;
-    long time;
-
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &time) == FAILURE) {
-        RETURN_NULL();
-    }
-
-    r = ngx_php_request;
-    ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
-
-    if (ctx == NULL) {
-
-    }
-
-    ctx->delay_time = time * 1000;
-
-    ngx_http_php_sleep(r);
-
-}
-
-PHP_METHOD(ngx, _exit)
+PHP_FUNCTION(ngx_exit)
 {
     long status = 0;
 
@@ -63,14 +23,14 @@ PHP_METHOD(ngx, _exit)
     zend_bailout();
 }
 
-PHP_METHOD(ngx, query_args)
+PHP_FUNCTION(ngx_query_args)
 {
-    ngx_http_request_t *r;
-    u_char *buf, *p;
-    char *query_key=NULL;
-    u_char *last;
-    int idx;
-    unsigned parsing_value = 0;
+    ngx_http_request_t  *r;
+    u_char              *buf, *p;
+    char                *query_key=NULL;
+    u_char              *last;
+    int                 idx;
+    unsigned            parsing_value = 0;
 
     r = ngx_php_request;
 
@@ -123,20 +83,18 @@ PHP_METHOD(ngx, query_args)
     }
 
     ngx_pfree(r->pool, buf);
-
-
 }
 
-PHP_METHOD(ngx, post_args)
+PHP_FUNCTION(ngx_post_args)
 {
-    ngx_http_request_t *r;
-    u_char *buf, *p;
-    char *post_key=NULL;
-    size_t len;
-    ngx_chain_t *cl;
-    u_char *last;
-    int idx;
-    unsigned parsing_value = 0;
+    ngx_http_request_t  *r;
+    u_char              *buf, *p;
+    char                *post_key=NULL;
+    size_t              len;
+    ngx_chain_t         *cl;
+    u_char              *last;
+    int                 idx;
+    unsigned            parsing_value = 0;
 
     r = ngx_php_request;
 
@@ -206,15 +164,192 @@ PHP_METHOD(ngx, post_args)
     }
 
     ngx_pfree(r->pool, buf);
+}
 
+PHP_FUNCTION(ngx_sleep)
+{
+    ngx_http_request_t  *r;
+    ngx_http_php_ctx_t  *ctx;
+    long                time;
 
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &time) == FAILURE) {
+        RETURN_NULL();
+    }
+
+    r = ngx_php_request;
+    ctx = ngx_http_get_module_ctx(r, ngx_http_php_module);
+
+    if (ctx == NULL) {
+
+    }
+
+    ctx->delay_time = time * 1000;
+
+    ngx_http_php_sleep(r);
+
+}
+
+PHP_METHOD(ngx, _exit)
+{
+    long status = 0;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &status) == FAILURE){
+        RETURN_NULL();
+    }
+
+    EG(exit_status) = status;
+
+    zend_bailout();
+}
+
+PHP_METHOD(ngx, query_args)
+{
+    ngx_http_request_t  *r;
+    u_char              *buf, *p;
+    char                *query_key=NULL;
+    u_char              *last;
+    int                 idx;
+    unsigned            parsing_value = 0;
+
+    r = ngx_php_request;
+
+    if (r->args.len == 0) {
+        RETURN_NULL();
+    }
+
+    array_init(return_value);
+    idx = 0;
+
+    buf = ngx_palloc(r->pool, r->args.len);
+    ngx_memcpy(buf, r->args.data, r->args.len);
+    last = buf + r->args.len;
+
+    p = buf;
+    parsing_value = 0;
+
+    while (buf != last) {
+        if (*buf == '=') {
+            query_key = ngx_pnalloc(r->pool, buf-p+1);
+            ngx_memzero(query_key, buf-p+1);
+            ngx_memcpy(query_key, p, buf-p);
+            //php_printf("%d, %.*s\n", buf-p,buf-p, p);
+            buf++;
+            p = buf;
+            parsing_value = 1;
+        }else if (*buf == '&') {
+            //php_printf("%.*s", buf-p, p);
+            add_assoc_stringl(return_value, (char *)query_key, (char *)p, buf-p);
+            ngx_pfree(r->pool, query_key);
+            //add_index_stringl(return_value, idx, (char *)p, buf-p);
+            idx++;
+
+            buf++;
+            p = buf;
+            parsing_value = 0;
+        }
+        
+        if (buf != last){
+            buf++;
+        }
+    }
+
+    if (parsing_value){
+        //php_printf("%.*s", buf-p, p);
+        add_assoc_stringl(return_value, (char *)query_key, (char *)p, buf-p);
+        ngx_pfree(r->pool, query_key);
+        //add_index_stringl(return_value, idx, (char *)p, buf-p);
+        idx++;
+    }
+
+    ngx_pfree(r->pool, buf);
+}
+
+PHP_METHOD(ngx, post_args)
+{
+    ngx_http_request_t  *r;
+    u_char              *buf, *p;
+    char                *post_key=NULL;
+    size_t              len;
+    ngx_chain_t         *cl;
+    u_char              *last;
+    int                 idx;
+    unsigned            parsing_value = 0;
+
+    r = ngx_php_request;
+
+    if (r->discard_body || r->request_body == NULL || 
+        r->request_body->temp_file || r->request_body->bufs == NULL) {
+        RETURN_NULL();
+    }
+
+    len = 0;
+    for (cl = r->request_body->bufs; cl; cl = cl->next) {
+        len += cl->buf->last - cl->buf->pos;
+    }
+
+    if (len == 0) {
+        RETURN_NULL();
+    }
+
+    array_init(return_value);
+    idx = 0;
+
+    buf = ngx_palloc(r->pool, len);
+    p = buf;
+    for (cl = r->request_body->bufs; cl; cl = cl->next) {
+        p = ngx_copy(p, cl->buf->pos, cl->buf->last - cl->buf->pos);
+    }
+
+    ngx_php_debug("post body: %.*s", (int)len, buf);
+
+    last = buf + len;
+
+    p = buf;
+    parsing_value = 0;
+
+    while (buf != last) {
+        if (*buf == '=') {
+            post_key = ngx_pnalloc(r->pool, buf-p+1);
+            //ngx_sprintf(post_key, "%*s", buf-p, p);
+            ngx_memzero(post_key, buf-p+1);
+            ngx_memcpy(post_key, p, buf-p);
+            //php_printf("%d, %.*s\n", buf-p,buf-p, p);
+            buf++;
+            p = buf;
+            parsing_value = 1;
+        }else if (*buf == '&') {
+            //php_printf("%.*s", buf-p, p);
+            add_assoc_stringl(return_value, (char *)post_key, (char *)p, buf-p);
+            ngx_pfree(r->pool, post_key);
+            //add_index_stringl(return_value, idx, (char *)p, buf-p);
+            idx++;
+
+            buf++;
+            p = buf;
+            parsing_value = 0;
+        }
+        
+        if (buf != last){
+            buf++;
+        }
+    }
+
+    if (parsing_value){
+        //php_printf("%.*s", buf-p, p);
+        add_assoc_stringl(return_value, (char *)post_key, (char *)p, buf-p);
+        ngx_pfree(r->pool, post_key);
+        //add_index_stringl(return_value, idx, (char *)p, buf-p);
+        idx++;
+    }
+
+    ngx_pfree(r->pool, buf);
 }
 
 PHP_METHOD(ngx, sleep)
 {
-    ngx_http_request_t *r;
-    ngx_http_php_ctx_t *ctx;
-    long time;
+    ngx_http_request_t  *r;
+    ngx_http_php_ctx_t  *ctx;
+    long                time;
 
     if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "l", &time) == FAILURE) {
         RETURN_NULL();
