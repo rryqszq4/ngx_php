@@ -11,9 +11,10 @@ ngx_php draws on the design of [ngx_lua](https://github.com/openresty/lua-nginx-
 
 ngx_php doesn't want to replace anything, just want to provide a solution.  
 
-There is a legacy version of [ngx_php5](https://github.com/rryqszq4/ngx_php/tree/ngx_php5), which records some of my past code practices and is also valuable.   
-
-[ngx_php7](https://github.com/rryqszq4/ngx_php7) is an active branch of development where you can get more fresh details.
+Milestones about the project
+---------------------------
+* [ngx_php5](https://github.com/rryqszq4/ngx_php/tree/ngx_php5) - A legacy version with php5, which records some of my past code practices and is also valuable.
+* [ngx_php7](https://github.com/rryqszq4/ngx_php7) - An active branch of development where you can get more fresh details.
 
 What's different with official php
 ----------------------------------
