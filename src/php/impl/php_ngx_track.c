@@ -1,8 +1,30 @@
-/**
- *    Copyright(c) 2016-2018 rryqszq4
- *
- *
- */
+/*
+==============================================================================
+Copyright (c) 2016-2019, rryqszq4 <rryqszq@gmail.com>
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+==============================================================================
+*/
 
 #include "php.h"
 #include "php_ini.h"
@@ -79,7 +101,7 @@ zend_op_array* ngx_compile_file(zend_file_handle* file_handle, int type TSRMLS_D
 php_printf("    ___                   __    \n");
 php_printf("  /`__ \\___  ___  ___  __/ /__  \n");
 php_printf(" / /_/ / _ \\/ _ `/ _ \\/ _ / __\\ \n");
-php_printf(" \\___./ .__/\\___.\\___/\\___\\__..   /ngx_php7_tracker\n"); 
+php_printf(" \\___./ .__/\\___.\\___/\\___\\__..   /ngx_php_tracker\n"); 
 php_printf("     /_/                         /version: %s\n", NGX_HTTP_PHP_MODULE_VERSION);
 php_printf("\n/* ~: IS_TMP_VAR, $: IS_VAR, !: IS_CV */\n\n");
             ctx->opcode_logo = 1;
@@ -125,7 +147,7 @@ zend_op_array *ngx_compile_string(zval *source_string, char *filename TSRMLS_DC)
 php_printf("    ___                   __    \n");
 php_printf("  /`__ \\___  ___  ___  __/ /__  \n");
 php_printf(" / /_/ / _ \\/ _ `/ _ \\/ _ / __\\ \n");
-php_printf(" \\___./ .__/\\___.\\___/\\___\\__..   /ngx_php7_tracker\n"); 
+php_printf(" \\___./ .__/\\___.\\___/\\___\\__..   /ngx_php_tracker\n"); 
 php_printf("     /_/                         /version: %s\n", NGX_HTTP_PHP_MODULE_VERSION);
 php_printf("\n/* ~: IS_TMP_VAR, $: IS_VAR, !: IS_CV */\n\n");
             ctx->opcode_logo = 1;
@@ -185,9 +207,11 @@ static int ngx_track_zval(zval zv)
         case IS_REFERENCE: 
             php_printf("%-16s","<reference>");
             return IS_REFERENCE;
+#if PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION <= 2
         case IS_CONSTANT: 
             php_printf("%-16s","<constant>");
             return IS_CONSTANT;
+#endif
         case IS_CALLABLE: 
             php_printf("%-16s","<callable>");
             return IS_CALLABLE;
@@ -206,20 +230,29 @@ static int ngx_track_zval(zval zv)
 static void ngx_track_znode(unsigned int node_type, znode_op node, zend_op_array *op_array TSRMLS_DC)
 {
     switch (node_type) {
+#if PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION <= 2
         case IS_UNDEF:
             ngx_track_zval(*RT_CONSTANT_EX(op_array->literals, node));
             break;
         case IS_CONST:
             ngx_track_zval(*RT_CONSTANT_EX(op_array->literals, node));
             break;
+#else
+        case IS_UNDEF:
+            ngx_track_zval(*RT_CONSTANT(op_array->literals, node));
+            break;
+        case IS_CONST:
+            ngx_track_zval(*RT_CONSTANT(op_array->literals, node));
+            break;
+#endif
         case IS_TMP_VAR:
-            php_printf("~%-15d", EX_VAR_TO_NUM(node.var));
+            php_printf("~%-15d", (uint32_t)(node.var));
             break;
         case IS_VAR:
-            php_printf("$%-15d", EX_VAR_TO_NUM(node.var));
+            php_printf("$%-15d", (uint32_t)(node.var));
             break;
         case IS_CV:
-            php_printf("!%-15d", EX_VAR_TO_NUM(node.var));
+            php_printf("!%-15d", (uint32_t)(node.var));
             break;
         default:
             php_printf("%-16s", " ");
@@ -438,9 +471,9 @@ ngx_track_zend_op(zend_op *opline, int tabs_len)
         ngx_track_print_sample_tabs(tabs_len);php_printf("------------------------------\n");
         ngx_track_print_sample_tabs(tabs_len);php_printf("|zend_op = %p {\n", opline);
         ngx_track_print_sample_tabs(tabs_len);php_printf("|.handler = %p\n", opline->handler);
-        ngx_track_print_sample_tabs(tabs_len);php_printf("|.op1 = %p\n", opline->op1);
-        ngx_track_print_sample_tabs(tabs_len);php_printf("|.op2 = %p\n", opline->op2);
-        ngx_track_print_sample_tabs(tabs_len);php_printf("|.result = %p\n", opline->result);
+        ngx_track_print_sample_tabs(tabs_len);php_printf("|.op1 = %p\n", &opline->op1);
+        ngx_track_print_sample_tabs(tabs_len);php_printf("|.op2 = %p\n", &opline->op2);
+        ngx_track_print_sample_tabs(tabs_len);php_printf("|.result = %p\n", &opline->result);
         ngx_track_print_sample_tabs(tabs_len);php_printf("|.extended_value = %d\n", opline->extended_value);
         ngx_track_print_sample_tabs(tabs_len);php_printf("|.lineno = %d\n", opline->lineno);
         ngx_track_print_sample_tabs(tabs_len);php_printf("|.opcode = %d\n", opline->opcode);
@@ -462,8 +495,8 @@ ngx_track_zend_op_array(zend_op_array *op_array)
         php_printf("------------------------------\n");
         php_printf("|zend_op_array = %p {\n", op_array);
         php_printf("|.type = %d\n", op_array->type);
-        php_printf("|.arg_flags = %d\n", op_array->arg_flags);
-        php_printf("|.fn_flags = %p\n", op_array->fn_flags);
+        php_printf("|.arg_flags = %p\n", op_array->arg_flags);
+        php_printf("|.fn_flags = %p\n", &op_array->fn_flags);
             if (op_array->scope) {
         php_printf("|    .function_name = %s::%s\n", ZSTR_VAL(op_array->scope->name), op_array->function_name?ZSTR_VAL(op_array->function_name):NULL);
             }else {
@@ -509,24 +542,24 @@ ngx_track_zend_execute_data(zend_execute_data *execute_data)
         }
         php_printf("|.func = %p\n", execute_data->func);
         if (execute_data->func) {
-        php_printf("|    .type = %d\n", execute_data->func->type,execute_data->func->type);
-            if (&execute_data->func->common) {
-        php_printf("|    .common = %p\n", execute_data->func->common);
+        php_printf("|    .type = %d\n", execute_data->func->type);
+            if ((uintptr_t)NULL != (uintptr_t)&execute_data->func->common) {
+        php_printf("|    .common = %p\n", &execute_data->func->common);
             fbc = execute_data->func;
         php_printf("|        .type = %d\n", fbc->common.type);
         php_printf("|        .arg_flags = %p\n", fbc->common.arg_flags);
-        php_printf("|        .fn_flags = %p\n", fbc->common.fn_flags);
+        php_printf("|        .fn_flags = %p\n", &fbc->common.fn_flags);
         php_printf("|        .function_name = %s\n", fbc->common.function_name?ZSTR_VAL(fbc->common.function_name):"(null)");
         php_printf("|        .prototype = %p\n", fbc->common.prototype);
-        php_printf("|        .num_args = %p\n", fbc->common.num_args);
-        php_printf("|        .required_num_args = %p\n", fbc->common.required_num_args);    
+        php_printf("|        .num_args = %p\n", &fbc->common.num_args);
+        php_printf("|        .required_num_args = %p\n", &fbc->common.required_num_args);    
         php_printf("|        .arg_info = %p\n", fbc->common.arg_info);
             }
-            if (&execute_data->func->op_array) {
-        php_printf("|    .op_array = %p\n", execute_data->func->op_array);
+            if ((uintptr_t)NULL != (uintptr_t)&execute_data->func->op_array) {
+        php_printf("|    .op_array = %p\n", &execute_data->func->op_array);
                 op_array = execute_data->func->op_array;
         php_printf("|        .type = %d\n", op_array.type);
-        php_printf("|        .fn_flags = %p\n", op_array.fn_flags);
+        php_printf("|        .fn_flags = %p\n", &op_array.fn_flags);
         php_printf("|        .last = %d\n", op_array.last);
                 if (op_array.scope) {
         php_printf("|        .function_name = %s::%s\n", ZSTR_VAL(op_array.scope->name), op_array.function_name?ZSTR_VAL(op_array.function_name):NULL);
@@ -540,7 +573,7 @@ ngx_track_zend_execute_data(zend_execute_data *execute_data)
                 }    
             }
         }
-        php_printf("|.This = %p\n", execute_data->This);
+        php_printf("|.This = %p\n", &execute_data->This);
 #if PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION < 1
         php_printf("|.called_scope = %p\n", execute_data->called_scope);
 #endif
@@ -559,23 +592,23 @@ ngx_track_zend_generator(zend_generator *generator, int tabs_len)
 
         ngx_track_print_sample_tabs(tabs_len);php_printf("------------------------------\n");
         ngx_track_print_sample_tabs(tabs_len);php_printf("|zend_generator = %p {\n", generator);
-        ngx_track_print_sample_tabs(tabs_len);php_printf("|.std = %p\n", generator->std);
+        ngx_track_print_sample_tabs(tabs_len);php_printf("|.std = %p\n", &generator->std);
         ngx_track_print_sample_tabs(tabs_len);php_printf("|.iterator = %p\n", generator->iterator);
         ngx_track_print_sample_tabs(tabs_len);php_printf("|.execute_data = %p\n", generator->execute_data);
         //ngx_track_zend_execute_data(generator->execute_data);
 #if PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION < 1
         ngx_track_print_sample_tabs(tabs_len);php_printf("|.stack = %p\n", generator->stack);
 #endif
-        ngx_track_print_sample_tabs(tabs_len);php_printf("|.value = %p\n", generator->value);
-        ngx_track_print_sample_tabs(tabs_len);php_printf("|.key = %p\n", generator->key);
-        ngx_track_print_sample_tabs(tabs_len);php_printf("|.retval = %p\n", generator->retval);
+        ngx_track_print_sample_tabs(tabs_len);php_printf("|.value = %p\n", &generator->value);
+        ngx_track_print_sample_tabs(tabs_len);php_printf("|.key = %p\n", &generator->key);
+        ngx_track_print_sample_tabs(tabs_len);php_printf("|.retval = %p\n", &generator->retval);
         ngx_track_print_sample_tabs(tabs_len);php_printf("|.send_target = %p\n", generator->send_target);
-        ngx_track_print_sample_tabs(tabs_len);php_printf("|.largest_used_integer_key = %p\n", generator->largest_used_integer_key);
-        ngx_track_print_sample_tabs(tabs_len);php_printf("|.values = %p\n", generator->values);
-        ngx_track_print_sample_tabs(tabs_len);php_printf("|.node = %p\n", generator->node);
+        ngx_track_print_sample_tabs(tabs_len);php_printf("|.largest_used_integer_key = %p\n", &generator->largest_used_integer_key);
+        ngx_track_print_sample_tabs(tabs_len);php_printf("|.values = %p\n", &generator->values);
+        ngx_track_print_sample_tabs(tabs_len);php_printf("|.node = %p\n", &generator->node);
         ngx_track_zend_generator_node(&generator->node, tabs_len*2);
-        ngx_track_print_sample_tabs(tabs_len);php_printf("|.execute_fake = %p\n", generator->execute_fake);
-        ngx_track_print_sample_tabs(tabs_len);php_printf("|.flags = %p\n", generator->flags);
+        ngx_track_print_sample_tabs(tabs_len);php_printf("|.execute_fake = %p\n", &generator->execute_fake);
+        ngx_track_print_sample_tabs(tabs_len);php_printf("|.flags = %p\n", &generator->flags);
         ngx_track_print_sample_tabs(tabs_len);php_printf("|}\n");
         ngx_track_print_sample_tabs(tabs_len);php_printf("------------------------------\n");
 
@@ -591,9 +624,9 @@ ngx_track_zend_generator_node(zend_generator_node *node, int tabs_len)
         ngx_track_print_sample_tabs(tabs_len);php_printf("------------------------------\n");
         ngx_track_print_sample_tabs(tabs_len);php_printf("|zend_generator_node = %p {\n", node);
         ngx_track_print_sample_tabs(tabs_len);php_printf("|.parent = %p\n", node->parent);
-        ngx_track_print_sample_tabs(tabs_len);php_printf("|.children = %p\n", node->children);
-        ngx_track_print_sample_tabs(tabs_len);php_printf("|.child = %p\n", node->child);
-        ngx_track_print_sample_tabs(tabs_len);php_printf("|.ptr = %p\n", node->ptr);
+        ngx_track_print_sample_tabs(tabs_len);php_printf("|.children = %p\n", &node->children);
+        ngx_track_print_sample_tabs(tabs_len);php_printf("|.child = %p\n", &node->child);
+        ngx_track_print_sample_tabs(tabs_len);php_printf("|.ptr = %p\n", &node->ptr);
         ngx_track_print_sample_tabs(tabs_len);php_printf("|}\n");
         ngx_track_print_sample_tabs(tabs_len);php_printf("------------------------------\n");
 
@@ -616,7 +649,7 @@ void ngx_execute_ex(zend_execute_data *execute_data TSRMLS_DC)
 php_printf("    ____                __      \n");
 php_printf("   / __/_.._ ___  ___  / /__    \n");
 php_printf("  _\\ \\/_  __/ _ `/ _ `/  '_/    \n");
-php_printf(" /___/ /__/ \\_,\\/\\___/_/\\_\\     /ngx_php7_tracker\n");
+php_printf(" /___/ /__/ \\_,\\/\\___/_/\\_\\     /ngx_php_tracker\n");
 php_printf("                               /version: %s\n\n", NGX_HTTP_PHP_MODULE_VERSION);
             ctx->stack_logo = 1;
         }
@@ -681,7 +714,7 @@ void ngx_execute_internal(zend_execute_data *execute_data, zval *return_value TS
 php_printf("    ____                __      \n");
 php_printf("   / __/_.._ ___  ___  / /__    \n");
 php_printf("  _\\ \\/_  __/ _ `/ _ `/  '_/    \n");
-php_printf(" /___/ /__/ \\_,\\/\\___/_/\\_\\     /ngx_php7_tracker\n");
+php_printf(" /___/ /__/ \\_,\\/\\___/_/\\_\\     /ngx_php_tracker\n");
 php_printf("                               /version: %s\n\n", NGX_HTTP_PHP_MODULE_VERSION);
             ctx->stack_logo = 1;
         }
