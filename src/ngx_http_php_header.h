@@ -26,67 +26,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ==============================================================================
 */
 
-#ifndef __PHP_NGX_SOCKETS_H__
-#define __PHP_NGX_SOCKETS_H__
+#ifndef __NGX_HTTP_PHP_HEADER_H_
+#define __NGX_HTTP_PHP_HEADER_H_
 
-#include <php.h>
-#include <php_ini.h>
-#include <ext/standard/info.h>
-#include <ngx_http.h>
+#include "ngx_http_php_module.h"
 
-#include "../../ngx_http_php_socket.h"
+ngx_str_t *ngx_http_php_output_header_get(ngx_http_request_t *r, const u_char *key_data, size_t key_len);
 
-#define php_ngx_sockets_le_socket_name "ngx_socket"
-
-typedef struct {
-	//ngx_http_php_socket_upstream_t  *upstream;
-	int type;
-	int error;
-} php_ngx_socket;
-
-typedef struct php_ngx_socket_s {
-
-	int type;
-	int error;
-
-} php_ngx_socket_t;
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_ngx_socket_create, 0, 0, 0)
-	ZEND_ARG_INFO(0, domain)
-	ZEND_ARG_INFO(0, type)
-	ZEND_ARG_INFO(0, protocol)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_ngx_socket_connect, 0, 0, 2)
-	ZEND_ARG_INFO(0, socket)
-	ZEND_ARG_INFO(0, addr)
-	ZEND_ARG_INFO(0, port)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_ngx_socket_close, 0, 0, 1)
-	ZEND_ARG_INFO(0, socket)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_ngx_socket_send, 0, 0, 3)
-	ZEND_ARG_INFO(0, socket)
-	ZEND_ARG_INFO(0, buf)
-	ZEND_ARG_INFO(0, len)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_ngx_socket_recv, 0, 0, 2)
-	ZEND_ARG_INFO(0, socket)
-	ZEND_ARG_INFO(1, buf)
-	ZEND_ARG_INFO(0, len)
-ZEND_END_ARG_INFO()
-
-PHP_FUNCTION(ngx_socket_create);
-PHP_FUNCTION(ngx_socket_connect);
-PHP_FUNCTION(ngx_socket_send);
-PHP_FUNCTION(ngx_socket_recv);
-PHP_FUNCTION(ngx_socket_read);
-PHP_FUNCTION(ngx_socket_write);
-PHP_FUNCTION(ngx_socket_close);
-
-void php_impl_ngx_sockets_init(int module_number TSRMLS_DC);
+ngx_int_t ngx_http_php_output_header_set(ngx_http_request_t *r, const u_char *key_data, size_t key_len, const u_char *value_data, size_t value_len);
 
 #endif
