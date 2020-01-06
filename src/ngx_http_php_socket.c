@@ -358,6 +358,8 @@ ngx_http_php_socket_connected_handler(ngx_http_request_t *r,
     ngx_http_php_socket_upstream_t *u)
 {
     ngx_php_debug("php socket connected handler");
+    u->read_event_handler = (ngx_http_php_socket_upstream_handler_pt) ngx_http_php_socket_dummy_handler;
+    u->write_event_handler = (ngx_http_php_socket_upstream_handler_pt) ngx_http_php_socket_dummy_handler;
 }
 
 static ngx_int_t 
@@ -537,6 +539,9 @@ ngx_http_php_socket_upstream_recv(ngx_http_request_t *r,
         if (n > 0) {
             b->last += n;
             b->start = NULL;
+
+            ngx_php_debug("buf write in php var.");
+            ZVAL_STRINGL(ctx->recv_buf, (char *)b->pos, b->last - b->pos);
             return NGX_AGAIN;
         }
 
@@ -640,6 +645,10 @@ ngx_http_php_socket_connect(ngx_http_request_t *r)
     //r->keepalive = 0;
 
     u = ctx->upstream;
+
+    u->connect_timeout = 60000;
+    u->read_timeout = 60000;
+    u->write_timeout = 60000;
 
     u->enabled_receive = 0;
 
@@ -759,7 +768,7 @@ ngx_http_php_socket_close(ngx_http_request_t *r)
 
     ngx_http_php_socket_finalize(r, u);
 
-    ctx->delay_time = 1;
+    ctx->delay_time = 0;
 
     ngx_http_php_sleep(r);
 
@@ -847,7 +856,7 @@ ngx_http_php_socket_recv(ngx_http_request_t *r)
     if (u->enabled_receive == 0) {
         u->enabled_receive = 1;
     }else {
-        ctx->delay_time = 1;
+        ctx->delay_time = 0;
         ngx_http_php_sleep(r);
     }
 

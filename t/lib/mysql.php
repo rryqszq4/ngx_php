@@ -94,7 +94,7 @@ class mysql {
     }
 
     private function write_packet($data, $len, $chr=1) {
-        $pack = $this->set_byte3($len).chr($chr).$data;
+        $pack = substr(pack('V', $len), 0, 3).chr($chr).$data;
         #var_dump("pack: ".$pack);
 
         //$pack = substr_replace(pack("V", $len), chr(1), 3, 1).$data;
@@ -146,14 +146,14 @@ class mysql {
 
     private function read_packet() {
         #var_dump("read_packet");
-        do {
-            $result = null;
-            yield ngx_socket_recv($this->socket, $result, 4);
-        } while (empty($result));
-        #$this->print_bin($result);
-        $field_count = unpack('v', substr($result, 0, 3))[1];
+        //do {
+            $data = '';
+            yield ngx_socket_recv($this->socket, $data, 4);
+        //} while (empty($data));
+        #$this->print_bin($data);
+        $field_count = unpack('v', substr($data, 0, 3))[1];
         #var_dump("field_count: ".$field_count);
-        $data = '';
+        //$data = '';
         yield ngx_socket_recv($this->socket, $data, $field_count);
         #$this->print_bin($data);
         if ($field_count != 1) {
@@ -282,8 +282,7 @@ class mysql {
         $token = $stage1 ^ $stage3;
 
 
-        $req = $this->set_byte4($client_flags)
-                .$this->set_byte4(1024*1024)
+        $req = pack('VV', $client_flags, 1048576)
                 .chr(0)
                 .str_repeat("\0", 23)
                 .$user."\0"
@@ -347,7 +346,7 @@ class mysql {
         #var_dump($db);
         $field['table'] = $table = $this->parse_field_data($result, $start);
         #var_dump($table);
-        $field['ori_table'] == $ori_table = $this->parse_field_data($result, $start);
+        $field['ori_table'] = $ori_table = $this->parse_field_data($result, $start);
         #var_dump($ori_table);
         $field['column'] = $column = $this->parse_field_data($result, $start);
         #var_dump($column);
@@ -402,7 +401,7 @@ class mysql {
         $this->rows[] = $row;
     }
 
-    public function connect($host="127.0.0.1", $port=3306, $user="root", $password="123456") {
+    public function connect($host="", $port="", $user="", $password="", $database="") {
         yield ngx_socket_connect($this->socket, $host, $port);
 
         $scramble = ( yield from $this->handshake_packet() );
